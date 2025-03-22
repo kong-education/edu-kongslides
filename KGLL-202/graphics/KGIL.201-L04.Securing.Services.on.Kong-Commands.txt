@@ -1,0 +1,290 @@
+# 04 - Securing Services on Kong
+
+
+## Lab: Securing Services on Kong
+
+cd
+source ~/kong-gateway-operations/installation/scram.sh
+
+cd
+git clone https://github.com/kong-education/kong-gateway-operations.git
+source ~/kong-gateway-operations/installation/scram.sh
+
+
+## Task: Create a service with a route
+
+http POST kongcluster:8001/services \
+  name=mockbin_service \
+  url=http://mockbin:8080/request
+
+### curl -sX POST kongcluster:8001/services \
+      -d name=mockbin_service \
+      -d url=http://mockbin:8080/request \
+      | jq
+
+http -f POST kongcluster:8001/services/mockbin_service/routes \
+  name=mockbin_route \
+  paths=/mockbin
+
+### curl -sX POST kongcluster:8001/services/mockbin_service/routes \
+      -d name=mockbin_route \
+      -d paths=/mockbin \
+      | jq
+
+
+## Task: Configure Rate Limiting and key-auth Plugins
+
+http -f POST kongcluster:8001/services/mockbin_service/plugins \
+  name=rate-limiting \
+  config.minute=5 \
+  config.policy=local
+
+### curl -sX POST kongcluster:8001/services/mockbin_service/plugins \
+      -d name=rate-limiting \
+      -d config.minute=5 \
+      -d config.policy=local \
+      | jq
+
+http POST kongcluster:8001/services/mockbin_service/plugins name=key-auth
+### curl -sX POST kongcluster:8001/services/mockbin_service/plugins \
+      -d name=key-auth \
+      | jq
+
+
+## Task: Create consumer and assign credentials
+
+http POST kongcluster:8001/consumers username=Jane
+### curl -sX POST kongcluster:8001/consumers -d username=Jane | jq
+http POST kongcluster:8001/consumers/Jane/key-auth key=JanePassword
+### curl -sX POST kongcluster:8001/consumers/Jane/key-auth \
+      -d key=JanePassword \
+      | jq
+
+
+## Task: Create Some Traffic for User
+
+for ((i=1;i<=20;i++))
+  do
+  sleep 1
+  http -h GET $KONG_PROXY_URI/mockbin/request?apikey=JanePassword
+done
+
+### for ((i=1;i<=20;i++))
+      do
+      sleep 1
+      curl -isX GET $KONG_PROXY_URI/mock/request?apikey=JanePassword
+    done
+
+
+## Task: Create mockbin service and route
+
+http DELETE kongcluster:8001/services/mockbin_service/routes/mockbin_route
+### curl -X DELETE kongcluster:8001/services/mockbin_service/routes/mockbin_route
+http DELETE kongcluster:8001/services/mockbin_service
+### curl -sX DELETE kongcluster:8001/services/mockbin_service
+
+http POST kongcluster:8001/services \
+  name=mockbin_service \
+  url=http://mockbin:8080/request
+
+### curl -sX POST kongcluster:8001/services \
+    -d name=mockbin_service \
+    -d url=http://mockbin:8080/request' \
+    | jq
+
+http -f POST kongcluster:8001/services/mockbin_service/routes \
+    name=mockbin_route \
+    paths=/mockbin
+
+### curl -sX POST kongcluster:8001/services/mockbin_service/routes \
+      -d name=mockbin_route \
+      -d paths=/mockbin \
+      | jq
+
+
+## Task: Enable JWT Plugin for a Service
+http POST kongcluster:8001/services/mockbin_service/plugins name=jwt
+
+### curl -sX POST kongcluster:8001/services/mockbin_service/plugins \
+      -d name=jwt \
+      | jq
+
+
+## Task: Create a consumer and assign JWT credentials
+
+http DELETE kongcluster:8001/consumers/Jane
+### curl -iX DELETE kongcluster:8001/consumers/Jane
+
+http POST kongcluster:8001/consumers username=Jane
+### curl -sX POST kongcluster:8001/consumers \
+      -d username=Jane \
+      | jq
+
+http POST kongcluster:8001/consumers/Jane/jwt
+### curl -sX POST kongcluster:8001/consumers/Jane/jwt | jq
+
+
+## Task: Get JWT key/secret for consumer
+
+KEY=$(http GET kongcluster:8001/consumers/Jane/jwt | jq '.data[0].key')
+echo '{"iss":'"$KEY"'}'
+SECRET=$(http GET kongcluster:8001/consumers/Jane/jwt | jq '.data[0].secret'|xargs)
+echo $SECRET
+TOKEN=$(jwt -e -s $SECRET --jwt '{"iss":'"$KEY"'}')
+echo $TOKEN
+
+
+## Task: Consume the service with JWT credentials
+
+http -h GET kongcluster:8000/mockbin
+### curl -IX GET kongcluster:8000/mockbin
+http -h GET kongcluster:8000/mockbin Authorization:"Bearer $TOKEN"
+### curl -isX GET kongcluster:8000/mockbin -H Authorization:"Bearer $TOKEN"
+
+
+## Task: Create a self-signed certificate
+
+cd ~/kong-gateway-operations/securing-services
+./create-certificate.sh
+
+
+## Kong Validating Client/Server Certificates
+
+openssl crl2pkcs7 -nocrl -certfile ~/.certificates/client.crt \
+| openssl pkcs7 -print_certs -noout
+
+
+## Task: Upload self-signed CA certificate to Kong
+
+CA_CERT_ID=$(http -f kongcluster:8001/ca_certificates \
+  cert@/home/labuser/.certificates/ca.cert.pem tags=ownCA \
+  | jq -r '.id')
+
+### CA_CERT_ID=$(curl -sX POST kongcluster:8001/ca_certificates \
+      -F cert=@/home/labuser/.certificates/ca.cert.pem \
+      -F tags=ownCA \
+      | jq -r '.id')
+
+echo $CA_CERT_ID
+
+
+## Task: Set up public and a private services & routes
+
+http POST kongcluster:8001/services \
+  name=public-service \
+  url=http://mockbin:8080/request
+
+### curl -sX POST kongcluster:8001/services \
+      -d name=public-service \
+      -d url=http://mockbin:8080/request \
+      | jq
+
+http -f POST kongcluster:8001/services/public-service/routes \
+  name=public-route \
+  paths=/public
+
+### curl -sX POST kongcluster:8001/services/public-service/routes \
+      -d name=public-route \
+      -d paths=/public \
+      | jq
+
+http POST kongcluster:8001/services \
+  name=confidential-service \
+  url=http://mockbin:8080/agent
+
+### curl -sX POST kongcluster:8001/services \
+      -d name=confidential-service \
+      -d url=http://mockbin:8080/agent \
+      | jq
+
+http -f POST kongcluster:8001/services/confidential-service/routes \
+  name=confidential-route \
+  paths=/confidential
+
+### curl -sX POST kongcluster:8001/services/confidential-service/routes \
+      -d name=confidential-route \
+      -d paths=/confidential \
+      | jq
+
+
+## Task: Verify traffic is being proxied
+
+http --verify=no GET https://kongcluster:8443/public
+### curl -ikX GET https://kongcluster:8443/public
+http --verify=no GET https://kongcluster:8443/confidential
+### curl -ikX GET https://kongcluster:8443/confidential
+
+
+## Task: Create a consumer
+
+http POST kongcluster:8001/consumers username=demo@example.com
+### curl POST kongcluster:8001/consumers -d username=demo@example.com | jq
+
+
+## Task: Implement the mTLS plugin to Kong
+
+http -f POST kongcluster:8001/services/confidential-service/plugins \
+  name=mtls-auth \
+  config.ca_certificates=$CA_CERT_ID \
+  config.revocation_check_mode='SKIP'
+
+### curl -sX POST kongcluster:8001/services/confidential-service/plugins \
+      -d name=mtls-auth \
+      -d config.ca_certificates=$CA_CERT_ID \
+      -d config.revocation_check_mode='SKIP' \
+      | jq
+
+
+## Task: Verify access for private service without a certificate
+
+http --verify=no https://kongcluster:8443/confidential
+### curl -ikX GET https://kongcluster:8443/confidential
+
+
+## Task: Verify access for private service with a certificate
+
+http --verify=no \
+     --cert=/home/labuser/.certificates/client.crt \
+     --cert-key=/home/labuser/.certificates/client.key \
+     https://kongcluster:8443/confidential
+
+### curl -ikX GET \
+      --key /home/labuser/.certificates/client.key \
+      --cert /home/labuser/.certificates/client.crt \
+      https://kongcluster:8443/confidential
+
+
+## Task: Verify public route is unaffected
+
+http --verify=no GET https://kongcluster:8443/public
+### curl -ikX GET https://kongcluster:8443/public
+
+
+## Task: Configure and Test Rate Limiting
+
+http -f POST kongcluster:8001/consumers/demo@example.com/plugins \
+   name=rate-limiting \
+   config.minute=5
+
+### curl -sX POST kongcluster:8001/consumers/demo@example.com/plugins \
+      -d name=rate-limiting \
+      -d config.minute=5 \
+      | jq
+
+for ((i=1;i<=10;i++))
+  do
+    http -h --verify=no --cert=/home/labuser/.certificates/client.crt \
+      --cert-key=/home/labuser/.certificates/client.key \
+      https://kongcluster:8443/confidential \
+      | head -1
+  done
+
+### for ((i=1;i<=10;i++))
+      do
+        curl -k -isX GET \
+          --key /home/labuser/.certificates/client.key \
+          --cert /home/labuser/.certificates/client.crt \
+          https://kongcluster:8443/confidential \
+          | head -1
+      done
+

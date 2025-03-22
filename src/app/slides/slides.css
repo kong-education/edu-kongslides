@@ -120,13 +120,22 @@ body:lang(en) {
 }
 
 .reveal h1::before {
-  background-image: var(--zenika-logo-monogram);
+  background-image: var(--kong-logo-monogram);
   background-size: cover;
   width: 180px;
   height: 180px;
   content: "";
   margin: 1em;
 }
+
+/* .reveal h1::before {
+  background-image: var(--zenika-logo-monogram);
+  background-size: cover;
+  width: 180px;
+  height: 180px;
+  content: "";
+  margin: 1em;
+} */
 
 .reveal h2,
 .reveal h3 {
@@ -218,6 +227,19 @@ body:lang(en) {
 }
 
 .slides section > section:not([class^="page-"]) {
+  background-image: url("./assets/kong-gradient-bar.png"),
+    var(--kong-logo-monogram);
+  --logo-offset-from-border: 50px;
+  background-position: top,
+    top var(--logo-offset-from-border) right
+      calc(
+        var(--logo-offset-from-border) - 18px
+          /* 18px is the height of the top gradient  */
+      );
+  background-repeat: no-repeat, no-repeat;
+  background-size: auto, 75px 75px;
+}
+/* .slides section > section:not([class^="page-"]) {
   background-image: url("./assets/zenika-gradient-bar.png"),
     var(--zenika-logo-monogram);
   --logo-offset-from-border: 50px;
@@ -225,11 +247,11 @@ body:lang(en) {
     top var(--logo-offset-from-border) right
       calc(
         var(--logo-offset-from-border) - 18px
-          /* 18px is the height of the top gradient bar */
+          /* 18px is the height of the top gradient bar
       );
   background-repeat: no-repeat, no-repeat;
   background-size: auto, 75px 75px;
-}
+}  */
 
 /*********************************************
  * SPECIALS PAGES

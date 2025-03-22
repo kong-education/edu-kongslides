@@ -157,7 +157,7 @@ function handleDotElementRevealSyntax(markdownSections) {
 
 function footer({ chapterIndex, slideIndex, materialVersion }) {
   return `
-    <footer class="copyright">&copy; Copyright ${new Date().getFullYear()} Zenika. All rights reserved</footer>
+    <footer class="copyright">&copy; Copyright ${new Date().getFullYear()} Kong. All rights reserved</footer>
     <footer class="slide-number">${slideNumber(
       chapterIndex,
       slideIndex

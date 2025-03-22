@@ -1,0 +1,238 @@
+# 07 - Advanced Plugins review
+
+
+## Lab: Advanced Plugins
+
+cd
+source ~/kong-gateway-operations/installation/scram.sh
+
+cd
+git clone https://github.com/kong-education/kong-gateway-operations.git
+source ~/kong-gateway-operations/installation/scram.sh
+
+
+## Task: Configure Service/Route/Plugin/Consumer
+
+http POST kongcluster:8001/services \
+  name=mockbin_service \
+  url=http://mockbin:8080/request
+
+### curl -sX POST kongcluster:8001/services \
+       -d name=mockbin_service \
+       -d url=http://mockbin:8080/request \
+       | jq
+
+http -f POST kongcluster:8001/services/mockbin_service/routes \
+  name=mockbin_route \
+  paths=/mockbin
+
+### curl -sX POST kongcluster:8001/services/mockbin_service/routes \
+      -d name=mockbin_route \
+      -d paths=/mockbin \
+      | jq
+
+http POST kongcluster:8001/services/mockbin_service/plugins name=key-auth
+### curl -sX POST kongcluster:8001/services/mockbin_service/plugins \
+      -d name=key-auth \
+      | jq
+
+http POST kongcluster:8001/consumers username=Jane
+### curl -sX POST kongcluster:8001/consumers \
+      -d username=Jane \
+      | jq
+
+http POST kongcluster:8001/consumers/Jane/key-auth key=JanePassword
+### curl -sX POST kongcluster:8001/consumers/Jane/key-auth \
+      -d key=JanePassword \
+      | jq
+
+
+## Task: Configure Rate Limiting Advanced Plugin
+
+http -f POST kongcluster:8001/plugins \
+  name=rate-limiting-advanced \
+  config.limit=10 \
+  config.limit=20 \
+  config.window_size=60 \
+  config.window_size=90 \
+  config.window_type=sliding \
+  config.sync_rate=0 \
+  config.strategy=redis \
+  config.redis.host=redis \
+  config.redis.port=6379
+
+### curl -sX POST kongcluster:8001/plugins \
+      -d name=rate-limiting-advanced \
+      -d config.limit=10 \
+      -d config.limit=20 \
+      -d config.window_size=60 \
+      -d config.window_size=90 \
+      -d config.window_type=sliding \
+      -d config.sync_rate=0 \
+      -d config.strategy=redis \
+      -d config.redis.host=redis \
+      -d config.redis.port=6379 \
+      | jq
+
+## Task: Create Traffic with Advanced Rate Limiting Plugin Enabled
+
+(for ((i=0;i<32;i++))
+   do
+     sleep 1
+     http GET $KONG_PROXY_URI/mockbin?apikey=JanePassword
+   done)
+
+### (for ((i=0;i<32;i++))
+       do
+         sleep 1
+         curl -isX GET $KONG_PROXY_URI/mockbin?apikey=JanePassword
+       done)
+
+
+## Task: Configure Request Transformer Advanced Plugin
+
+http --form POST kongcluster:8001/plugins \
+  name=request-transformer-advanced \
+  config.add.headers=X-Kong-Test-Request-Header:MyRequestHeader \
+  config.rename.headers=User-Agent:My-User-Agent
+
+### curl -sX POST kongcluster:8001/plugins \
+      -d name=request-transformer-advanced \
+      -d config.add.headers=X-Kong-Test-Request-Header:MyRequestHeader \
+      -d config.rename.headers=User-Agent:My-User-Agent \
+      | jq
+
+
+## Task: Create Request to See Request Headers
+
+http GET $KONG_PROXY_URI/mockbin?apikey=JanePassword
+### curl -sX GET $KONG_PROXY_URI/mockbin?apikey=JanePassword | jq
+
+
+## Task: Configure Response Transformer Advanced Plugin
+
+http -f POST kongcluster:8001/plugins \
+  name=response-transformer-advanced \
+  config.add.json=json-key-added:Test-Key \
+  config.add.headers=X-Kong-Test-Response-Header:MyResponseHeader
+
+### curl -sX POST kongcluster:8001/plugins \
+    -d name=response-transformer-advanced \
+    -d config.add.json=json-key-added:Test-Key \
+    -d config.add.headers=X-Kong-Test-Response-Header:MyResponseHeader \
+    | jq
+
+
+## Task: Create Request to See Response Headers/Body
+
+http GET $KONG_PROXY_URI/mockbin?apikey=JanePassword
+### curl -isX GET $KONG_PROXY_URI/mockbin?apikey=JanePassword
+
+
+## Task: Configure jq Plugin
+
+http -b GET kongcluster:8000/mockbin?apikey=JanePassword
+### curl -sX GET kongcluster:8000/mockbin?apikey=JanePassword | jq
+
+http -f POST kongcluster:8001/services/mockbin_service/plugins \
+    name=jq \
+    config.response_jq_program='del(.queryString.apikey)'
+
+### curl -sX POST kongcluster:8001/services/mockbin_service/plugins \
+      -d name=jq \
+      -d config.response_jq_program='del(.queryString.apikey)' \
+      | jq
+
+
+## Task: Create Request to See Response Body
+
+http -b GET $KONG_PROXY_URI/mockbin/request?apikey=JanePassword
+### curl -sX GET $KONG_PROXY_URI/mockbin/request?apikey=JanePassword | jq
+
+
+## Task: Use Transformation Function
+
+http GET kongcluster:8000/mockbin
+### curl -sX GET kongcluster:8000/mockbin
+
+$ cat << EOF > transform.lua
+-- transform.lua
+    return function(status, body, headers)
+      if not body or not body.message then
+        return status, body, headers
+      end
+
+      headers = { ["X-Some-Header"] = "ETP Triggered" }
+      local new_body = {
+        error = true,
+        status = status,
+        message = body.message .. ", Achtung!",
+      }
+
+      return status, new_body, headers
+    end
+EOF
+
+
+## Task: Configure Exit Transformer Plugin
+
+http -f POST kongcluster:8001/services/mockbin_service/plugins \
+  "name=exit-transformer" \
+  "config.functions=@transform.lua"
+
+### curl -sX POST http://kongcluster:8001/services/mockbin_service/plugins \
+      -F "name=exit-transformer"  \
+      -F "config.functions=@transform.lua" \
+     | jq
+
+
+Task: Create Request to See Response Header/Body Transformation
+
+http GET $KONG_PROXY_URI/mockbin
+### curl -isX GET $KONG_PROXY_URI/mockbin
+
+
+## Task: Enable the Prometheus Plugin & Generate Traffic
+
+http -f POST kongcluster:8001/plugins name=prometheus
+### curl -sX POST kongcluster:8001/plugins \
+      -d name=prometheus \
+      | jq
+
+for ((i=0;i<128;i++))
+    do
+      sleep 1
+      http -h GET $KONG_PROXY_URI/mockbin?apikey=JanePassword > /dev/null 2>&1
+      sleep 1
+      http -h GET $KONG_PROXY_URI/mockbin > /dev/null 2>&1
+    done &
+
+### for ((i=0;i<128;i++))
+      do
+        sleep 1
+        curl -IsX GET $KONG_PROXY_URI/mockbin?apikey=JanePassword > /dev/null 2>&1
+        sleep 1
+        curl -IsX GET $KONG_PROXY_URI/mockbin > /dev/null 2>&1
+      done &
+
+
+## Task: Get Prometheus Plugin Metrics through API
+
+http GET kongcluster:8101/metrics | grep mockbin
+### curl -sX GET kongcluster:8101/metrics | grep mockbin
+
+http GET kongcluster:8100/metrics | grep mockbin
+### curl -sX GET kongcluster:8100/metrics | grep mockbin
+
+http GET kongcluster:8100/metrics
+### curl -sX GET kongcluster:8100/metrics
+
+## Task: Configure Grafana
+
+env | grep GRAFANA_URI
+
+
+## Task: Get Metrics from Prometheus
+
+env | grep PROMETHEUS_URI
+

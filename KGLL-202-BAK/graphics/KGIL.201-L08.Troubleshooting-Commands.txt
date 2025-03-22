@@ -1,0 +1,153 @@
+# 08 - Troubleshooting
+
+## Lab: Troubleshooting in Kong
+
+cd
+source ~/kong-gateway-operations/installation/scram.sh
+
+cd
+git clone https://github.com/kong-education/kong-gateway-operations.git
+source ~/kong-gateway-operations/installation/scram.sh
+
+
+## Triage, Examine, Diagnose
+
+http GET kongcluster:8001
+### curl -sX GET kongcluster:8001 | jq
+http GET kongcluster:8001/status
+### curl -sX GET kongcluster:8001/status | jq
+http GET kongcluster:8001/metrics
+### curl -X GET kongcluster:8001/metrics
+
+
+## Task: Gather :8001/ information
+
+http GET kongcluster:8001 | jq '.' > 8001.json
+### curl -sX GET kongcluster:8001 | jq '.' > 8001.json
+jq -C '.' 8001.json | less -R
+
+
+## Task: Gather :8001/status information
+
+http GET kongcluster:8001/status | jq '.' > 8001-status.json
+### curl -sX GET kongcluster:8001/status | jq '.' > 8001-status.json
+jq -C '.' 8001-status.json | less -R
+
+
+## Task: Explore Error Logs
+
+grep oidc /srv/shared/logs/proxy_error.log | grep consumer
+
+
+## Task: Explore Startup System Log
+
+docker exec kong-cp kong reload
+docker exec kong-cp kong reload --v
+docker exec kong-cp kong reload --vv
+
+
+## Task: Use Debug Header to see used Service/Route
+
+http POST kongcluster:8001/services name=mockbin_service url=http://mockbin:8080/request
+### curl -sX POST kongcluster:8001/services \
+      -d name=mockbin_service \
+      -d url=http://mockbin:8080/request \
+      | jq
+
+http -f POST kongcluster:8001/services/mockbin_service/routes name=mockbin_route paths=/mockbin
+### curl -sX POST kongcluster:8001/services/mockbin_service/routes \
+      -d name=mockbin_route \
+      -d paths=/mockbin \
+      | jq
+
+http -h GET kongcluster:8000/mockbin Kong-Debug:1
+### curl -IX GET kongcluster:8000/mockbin -H Kong-Debug:1
+
+
+## Task: Use Granular Tracing to Log Details
+
+http POST kongcluster:8001/services/mockbin_service/plugins name=key-auth
+### curl -sX POST kongcluster:8001/services/mockbin_service/plugins \
+      -d name=key-auth \
+      | jq
+
+http POST kongcluster:8001/consumers username=Jane
+### curl -sX POST kongcluster:8001/consumers \
+      -d username=Jane \
+      | jq
+
+http POST kongcluster:8001/consumers/Jane/key-auth key=JanePassword
+### curl -sX POST kongcluster:8001/consumers/Jane/key-auth \
+      -d key=JanePassword \
+      | jq
+
+cd ~/kong-gateway-operations/installation
+cat docker-compose.yaml | grep 'KONG_TRACING'
+
+http -h GET kongcluster:8000/mockbin apikey:JanePassword X-Trace:1 | head -1
+### curl -isX GET kongcluster:8000/mockbin -H apikey:JanePassword -H X-Trace:1 | head -1
+http -h GET kongcluster:8000/mockbin X-Trace:1 | head -1
+### curl -isX GET kongcluster:8000/mockbin -H X-Trace:1 | head -1
+less /srv/shared/logs/granular_tracing.log
+
+
+## Task: Explore Audit Logs
+
+http GET kongcluster:8001/license/report
+http GET kongcluster:8001/audit/requests
+
+
+## Task: Network troubleshooting with cURL
+
+curl -svv --fail --trace-time https://api.github.com/repos/kong/kong | jq
+
+curl -o /dev/null --silent --show-error --write-out '\n\nlookup: %{time_namelookup}\nconnect: %{time_connect}\nappconnect: %{time_appconnect}\npretransfer: %{time_pretransfer}\nredirect: %{time_redirect}\nstarttransfer: %{time_starttransfer}\ntotal: %{time_total}\nsize: %{size_download}\n\n' 'https://api.github.com/repos/kong/kong'
+
+
+## Task: Broken Lab Scenario 1
+
+cd ~/kong-gateway-operations/troubleshooting
+deck sync --state broken-lab1.yaml
+
+http -h GET $KONG_PROXY_URI/mockbin/request?apikey=JanePassword | head -1
+## curl -IX GET $KONG_PROXY_URI/mockbin/request?apikey=JanePassword | head -1
+
+
+## Broken Lab Scenario 1: Solution
+
+http PATCH kongcluster:8001/services/mockbin protocol=http
+### curl -sX PATCH kongcluster:8001/services/mockbin \
+      -d protocol=http \
+      | jq
+
+
+## Task: Broken Lab Scenario 2
+
+cd ~/kong-gateway-operations/troubleshooting
+deck sync --state broken-lab2.yaml
+http GET $KONG_PROXY_URI/mockbin X-with-ID:true
+
+
+## Broken Lab Scenario 2: Solution
+
+CORL_PLUGIN_ID=$(http GET kongcluster:8001/routes/correlation/plugins/ \
+              | jq -r '.data[] | select(.name == "correlation-id") | .id')
+
+### OIDC_PLUGIN_ID=$(curl -sX GET kongcluster:8001/routes/my-oidc-route/plugins/ \
+                  | jq -r '.data[] | select(.name == "openid-connect") | .id')
+
+http -f PATCH kongcluster:8001/plugins/$CORL_PLUGIN_ID \
+  config.generator=uuid
+
+### curl -sX PATCH kongcluster:8001/plugins/$OIDC_PLUGIN_ID \
+      -d config.consumer_claim=preferred_username \
+      | jq
+
+TRNS_PLUGIN_ID=$(http GET kongcluster:8001/routes/nocorrelation/plugins/ \
+              | jq -r '.data[] | select(.name == "request-transformer") | .id')
+
+### TRNS_PLUGIN_ID=$(curl -sX GET kongcluster:8001/routes/nocorrelation/plugins/ \
+                  | jq -r '.data[] | select(.name == "request-transformer") | .id')
+
+http DELETE kongcluster:8001/plugins/$TRNS_PLUGIN_ID
+### curl -sX DELETE kongcluster:8001/plugins/$TRNS_PLUGIN_ID

@@ -1,0 +1,184 @@
+# 01 - Kong Gateway Installation
+
+
+## Task: Obtain docker certificates, compose file etc.
+
+git clone https://github.com/kong-education/kong-gateway-operations.git
+cd kong-gateway-operations/installation
+./setup-docker.sh
+ls -la
+
+
+## Task: Move SSL certificates
+
+cp -R ssl-certs /srv/shared
+
+
+## Task: Instantiate log files and deploy Kong
+
+mkdir -p /srv/shared/logs
+touch $(grep '/srv/shared/logs/' docker-compose.yaml|awk '{print $2}'|xargs)
+chmod a+w /srv/shared/logs/*
+docker-compose up -d
+
+
+## Training Lab Environment
+
+env | grep KONG_ | grep -v SERVICE | sort
+
+
+## Task: Verify Admin API
+
+http -h GET kongcluster:8001
+### curl -IX GET kongcluster:8001
+
+
+## Task: Verify Kong Manager
+
+echo $KONG_MANAGER_URI
+
+
+## Task: Apply and review the licence
+
+http -h POST kongcluster:8001/licenses \
+  payload=@/etc/kong/license.json \
+  | grep HTTP
+
+### curl -isX POST kongcluster:8001/licenses \
+      -F payload=@/etc/kong/license.json \
+      | grep HTTP
+
+http GET kongcluster:8001/license/report
+### curl -sX GET kongcluster:8001/license/report | jq
+
+jq . /etc/kong/license.json
+
+
+## Task: Recreate/Restart the CP to enable EE features
+
+docker-compose stop kong-cp
+docker-compose rm -f kong-cp
+docker-compose up -d kong-cp
+
+
+## Task: Enable the Developer Portal:
+
+http -f PATCH kongcluster:8001/workspaces/default \
+  config.portal=true
+
+### curl -sX PATCH kongcluster:8001/workspaces/default \
+      -d "config.portal=true" \
+      | jq
+
+
+## Task : Create a Developer Account
+
+http POST $KONG_PORTAL_API_URI/default/register <<< '{"email":"myemail@example.com",
+                                                      "password":"password",
+                                                      "meta":"{\"full_name\":\"Dev E. Loper\"}"
+                                                     }'
+
+### curl -X POST "$KONG_PORTAL_API_URI/default/register" \
+      -H 'Content-Type: application/json' \
+      --data-raw '{"email":"myemail@example.com",
+      "password":"password",
+      "meta":"{\"full_name\":\"Dev E. Loper\"}"
+                  }' \
+      | jq
+
+
+## Task: Approve the Developer
+
+http PATCH "$KONG_ADMIN_API_URI/default/developers/myemail@example.com" <<< '{"status": 0}'
+
+### curl -sX PATCH "$KONG_ADMIN_API_URI/default/developers/myemail@example.com" \
+      -H 'Content-Type: application/json' \
+      -d '{"status": 0}' \
+      | jq
+
+http GET kongcluster:1080/api/emails
+### curl -sX GET kongcluster:1080/api/emails | jq
+
+
+## Task: Add an API Spec to test
+
+http --form POST kongcluster:8001/files \
+  "path=specs/jokes.one.oas.yaml" \
+  "contents=@jokes1OAS.yaml"
+
+### curl -sX POST kongcluster:8001/files \
+      -F "path=specs/jokes.one.oas.yaml" \
+      -F "contents=@jokes1OAS.yaml" \
+      | jq
+
+
+## Using decK
+
+
+## Task: Configure decK and Create a sample Service/Route
+
+cd ~/kong-gateway-operations/installation
+sed -i "s|KONG_ADMIN_API_URI|$KONG_ADMIN_API_URI|g" deck/deck.yaml
+cp deck/deck.yaml ~/.deck.yaml
+
+http POST kongcluster:8001/services \
+  name=mockbin_service \
+  url=http://mockbin:8080/request
+
+### curl -sX POST kongcluster:8001/services \
+      -d name=mockbin_service \
+      -d url=http://mockbin:8080/request \
+      | jq
+
+http -f POST kongcluster:8001/services/mockbin_service/routes \
+  name=mockbin_route \
+  paths=/mockbin
+
+### curl -sX POST kongcluster:8001/services/mockbin_service/routes \
+      -d name=mockbin_route \
+      -d paths=/mockbin \
+      | jq
+
+
+## Task: Save/Load Kong configuration using decK
+
+deck dump \
+  --output-file labdump.yaml \
+  --workspace default
+
+deck diff --state labdump.yaml
+deck reset
+deck diff --state labdump.yaml
+
+## Task: Sync updates and view config in Kong Manager
+
+deck diff \
+  --state deck/sampledump.yaml \
+  --workspace default
+
+deck sync \
+  --state deck/sampledump.yaml \
+  --workspace default
+
+## Task: Restore Kong configuration using decK
+
+cat labdump.yaml
+
+deck sync \
+  --state labdump.yaml \
+  --workspace default
+
+
+## Task: Confirm Service Restoration
+
+http GET kongcluster:8001/services
+### curl -sX GET kongcluster:8001/services | jq
+
+http GET kongcluster:8001/routes
+### curl -sX GET kongcluster:8001/routes | jq
+
+http GET kongcluster:8000/mockbin
+### curl -iX GET kongcluster:8000/mockbin
+
+http --verify no GET https://kongcluster:8443/mockbin
+### curl -k -iX GET https://kongcluster:8443/mockbin

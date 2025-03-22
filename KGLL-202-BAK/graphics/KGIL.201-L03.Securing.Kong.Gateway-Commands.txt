@@ -1,0 +1,468 @@
+# 03 - Securing Kong Gatway
+
+
+## Lab: Securing Kong Gateway
+
+cd
+git clone https://github.com/kong-education/kong-gateway-operations.git
+source kong-gatway-operations/installation/scram.sh
+
+## Task: Create New Role my_role and add Permissions
+
+http POST kongcluster:8001/rbac/roles name=my_role
+### curl -sX POST kongcluster:8001/rbac/roles -d name=my_role | jq
+
+http POST kongcluster:8001/rbac/roles/my_role/endpoints/ \
+  	endpoint=* \
+  	workspace=default \
+  	actions=*
+
+### curl -sX POST kongcluster:8001/rbac/roles/my_role/endpoints/ \
+  	  -d endpoint=* \
+  	  -d workspace=default \
+  	  -d actions=* \
+      | jq
+
+
+## Task: Create an RBAC user called 'my-super-admin'
+
+http post kongcluster:8001/rbac/users name=my-super-admin user_token="my_token"
+### curl -sX POST kongcluster:8001/rbac/users \
+      -d name=my-super-admin \
+      -d user_token="my_token" \
+      | jq
+
+
+## Task: Assign role created earlier and Verify user
+
+http POST kongcluster:8001/rbac/users/my-super-admin/roles roles='my_role'
+### curl -sX POST kongcluster:8001/rbac/users/my-super-admin/roles -d roles='my_role' | jq
+
+http GET kongcluster:8001/rbac/users/my-super-admin/roles
+### curl -sX GET kongcluster:8001/rbac/users/my-super-admin/roles | jq
+
+## Task: Assign super-admin Role to my-super-admin
+
+http POST kongcluster:8001/rbac/users/my-super-admin/roles roles='super-admin'
+### curl -sX POST kongcluster:8001/rbac/users/my-super-admin/roles -d roles='super-admin' | jq
+
+
+## Task: Verify my-super-admin Role
+
+http GET kongcluster:8001/rbac/users/my-super-admin/roles
+### curl -sX GET kongcluster:8001/rbac/users/my-super-admin/roles | jq
+
+
+## Task: Automatically Assign Roles to RBAC user
+
+http POST kongcluster:8001/rbac/users \
+  name=super-admin \
+  user_token="super-admin"
+
+### curl -sX POST kongcluster:8001/rbac/users \
+      -d name=super-admin \
+      -d user_token="super-admin" \
+      | jq
+
+http GET kongcluster:8001/rbac/users/super-admin/roles
+### curl -sX GET kongcluster:8001/rbac/users/super-admin/roles | jq
+
+
+## Task: Enable RBAC, reducing default cookie_lifetime
+
+cd ~/kong-gateway-operations/installation
+sed -i 's|#KONG_ENFORCE_RBAC|\ KONG_ENFORCE_RBAC|g' docker-compose.yaml
+sed -i 's|#KONG_ADMIN_GUI_AUTH|\ KONG_ADMIN_GUI_AUTH|g' docker-compose.yaml
+sed -i 's|#KONG_ADMIN_GUI_SESSION_CONF|\ KONG_ADMIN_GUI_SESSION_CONF|g' docker-compose.yaml
+sed -i 's|:36000|:60|g' docker-compose.yaml
+docker-compose stop kong-cp; docker-compose rm -f kong-cp; docker-compose up -d kong-cp
+
+
+## Task: Revert cookie_lifetime to default value
+
+sed -i 's|:60|:36000|g' docker-compose.yaml
+docker-compose stop kong-cp; docker-compose rm -f kong-cp; docker-compose up -d kong-cp
+
+
+## Task: Verify Authentication with Admin API
+
+http -h GET kongcluster:8001/services
+### curl -sX GET kongcluster:8001/services
+http -h GET kongcluster:8001/services Kong-Admin-Token:my_token
+### curl -sX GET kongcluster:8001/services -H Kong-Admin-Token:my_token | jq
+
+
+## Task: Create WorkspaceA & WorkspaceB
+
+http POST kongcluster:8001/workspaces name=WorkspaceA Kong-Admin-Token:my_token
+### curl -sX POST kongcluster:8001/workspaces \
+      -d name=WorkspaceA \
+      -H Kong-Admin-Token:my_token \
+      | jq
+
+http POST kongcluster:8001/workspaces name=WorkspaceB Kong-Admin-Token:my_token
+### curl -sX POST kongcluster:8001/workspaces \
+      -d name=WorkspaceB \
+      -H Kong-Admin-Token:my_token \
+      | jq
+
+http GET kongcluster:8001/workspaces Kong-Admin-Token:my_token | jq '.data[].name'
+### curl -sX GET kongcluster:8001/workspaces \
+      -H Kong-Admin-Token:my_token \
+      | jq '.data[].name'
+
+
+## Task: Create AdminA & AdminB
+
+http POST kongcluster:8001/WorkspaceA/rbac/users \
+  name=AdminA \
+  user_token=AdminA_token \
+  Kong-Admin-Token:super-admin
+
+### curl -sX POST kongcluster:8001/WorkspaceA/rbac/users \
+      -d name=AdminA \
+      -d user_token=AdminA_token \
+      -H Kong-Admin-Token:super-admin \
+      | jq
+
+http POST kongcluster:8001/WorkspaceB/rbac/users \
+  name=AdminB \
+  user_token=AdminB_token \
+  Kong-Admin-Token:super-admin
+
+### curl -sX POST kongcluster:8001/WorkspaceB/rbac/users \
+      -d name=AdminB \
+      -d user_token=AdminB_token \
+      -H Kong-Admin-Token:super-admin \
+      | jq
+
+
+## Task: Verify AdminA & AdminB
+
+http GET kongcluster:8001/WorkspaceA/rbac/users Kong-Admin-Token:super-admin
+### curl -sX GET kongcluster:8001/WorkspaceA/rbac/users \
+      -H Kong-Admin-Token:super-admin \
+      | jq
+
+http GET kongcluster:8001/WorkspaceB/rbac/users Kong-Admin-Token:super-admin
+### curl -sX GET kongcluster:8001/WorkspaceB/rbac/users \
+      -H Kong-Admin-Token:super-admin \
+      | jq
+
+
+## Task: Create an admin role & permissions for WorkspaceA
+
+http POST kongcluster:8001/WorkspaceA/rbac/roles \
+  name=admin \
+  Kong-Admin-Token:super-admin
+
+### curl -sX POST kongcluster:8001/WorkspaceA/rbac/roles \
+      -d name=admin \
+      -H Kong-Admin-Token:super-admin \
+      | jq
+
+http POST kongcluster:8001/WorkspaceA/rbac/roles/admin/endpoints/ \
+  endpoint=* \
+  workspace=WorkspaceA \
+  actions=* \
+  Kong-Admin-Token:super-admin
+
+### curl -sX POST kongcluster:8001/WorkspaceA/rbac/roles/admin/endpoints/ \
+      -d endpoint=* \
+      -d workspace=WorkspaceA \
+      -d actions=* \
+      -H Kong-Admin-Token:super-admin \
+      | jq
+
+
+## Task: Create an admin role & permissions for WorkspaceB
+
+http POST kongcluster:8001/WorkspaceB/rbac/roles \
+  name=admin \
+  Kong-Admin-Token:super-admin
+
+### curl -sX POST kongcluster:8001/WorkspaceB/rbac/roles \
+      -d name=admin \
+      -H Kong-Admin-Token:super-admin \
+      | jq
+
+http POST kongcluster:8001/WorkspaceB/rbac/roles/admin/endpoints/ \
+  endpoint=* \
+  workspace=WorkspaceB \
+  actions=* \
+  Kong-Admin-Token:super-admin
+
+### curl -sX POST kongcluster:8001/WorkspaceB/rbac/roles/admin/endpoints/ \
+  	  -d endpoint=* \
+  	  -d workspace=WorkspaceB \
+  	  -d actions=* \
+  	  -H Kong-Admin-Token:super-admin \
+      | jq
+
+
+## Task: Assign admin role to admin user in each workspace
+
+http POST kongcluster:8001/WorkspaceA/rbac/users/AdminA/roles/ \
+  roles=admin \
+  Kong-Admin-Token:super-admin
+
+### curl -sX POST kongcluster:8001/WorkspaceA/rbac/users/AdminA/roles/ \
+      -d roles=admin \
+      -H Kong-Admin-Token:super-admin \
+      | jq
+
+http POST kongcluster:8001/WorkspaceB/rbac/users/AdminB/roles/ \
+  roles=admin \
+  Kong-Admin-Token:super-admin
+
+### curl -sX POST kongcluster:8001/WorkspaceB/rbac/users/AdminB/roles/ \
+      -d roles=admin \
+      -H Kong-Admin-Token:super-admin \
+      | jq
+
+
+## Task: Verify AdminA/AdminB access to corresponding Workspaces
+
+http GET kongcluster:8001/WorkspaceA/rbac/users Kong-Admin-Token:AdminA_token
+### curl -sX GET kongcluster:8001/WorkspaceA/rbac/users \
+      -H Kong-Admin-Token:AdminA_token \
+      | jq
+
+http GET kongcluster:8001/WorkspaceA/rbac/users Kong-Admin-Token:AdminB_token
+### curl -sX GET kongcluster:8001/WorkspaceA/rbac/users \
+      -H Kong-Admin-Token:AdminB_token \
+      | jq
+
+http GET kongcluster:8001/WorkspaceB/rbac/users Kong-Admin-Token:AdminB_token
+### curl -sX GET kongcluster:8001/WorkspaceB/rbac/users \
+      -H Kong-Admin-Token:AdminB_token \
+      | jq
+
+http GET kongcluster:8001/WorkspaceB/rbac/users Kong-Admin-Token:AdminA_token
+### curl -sX GET kongcluster:8001/WorkspaceB/rbac/users \
+      -H Kong-Admin-Token:AdminA_token \
+      | jq
+
+
+## Task: Deploy a service to WorkspaceA with correct Admin
+
+http POST kongcluster:8001/WorkspaceA/services \
+  name=mockbin_service \
+  url=http://mockbin:8080 \
+  Kong-Admin-Token:AdminB_token
+
+### curl -sX POST kongcluster:8001/WorkspaceA/services \
+  -d name=mockbin_service \
+  -d url=http://mockbin:8080 \
+  -H Kong-Admin-Token:AdminB_token \
+  | jq
+
+http POST kongcluster:8001/WorkspaceA/services \
+  name=mockbin_service \
+  url=http://mockbin:8080 \
+  Kong-Admin-Token:AdminA_token
+
+### curl -sX POST kongcluster:8001/WorkspaceA/services \
+  -d name=mockbin_service \
+  -d url=http://mockbin:8080 \
+  -H Kong-Admin-Token:AdminA_token \
+  | jq
+
+http -f POST kongcluster:8001/WorkspaceA/services/mockbin_service/routes \
+  name=mockbin_route \
+  hosts=myhost.me \
+  paths=/mockbin \
+  Kong-Admin-Token:AdminA_token
+
+### curl -sX POST kongcluster:8001/WorkspaceA/services/mockbin_service/routes \
+      -d name=mockbin_route \
+      -d hosts=myhost.me \
+      -d paths=/mockbin \
+      -H Kong-Admin-Token:AdminA_token \
+      | jq
+
+## Task: Verify service in WorkspaceA
+
+http --header GET kongcluster:8000/mockbin host:myhost.me | grep HTTP
+### curl -sIX GET kongcluster:8000/mockbin -H host:myhost.me | grep HTTP
+
+## Task: Add TeamA_engineer & TeamB_engineer to the workspace teams
+
+http POST kongcluster:8001/WorkspaceA/rbac/users \
+  name=TeamA_engineer \
+  user_token=teama_engineer_user_token \
+  Kong-Admin-Token:AdminB_token
+
+### curl -sX POST kongcluster:8001/WorkspaceA/rbac/users \
+     -d name=TeamA_engineer \
+     -d user_token=teama_engineer_user_token \
+     -H Kong-Admin-Token:AdminB_token \
+    | jq
+
+http POST kongcluster:8001/WorkspaceA/rbac/users \
+  name=TeamA_engineer \
+  user_token=teama_engineer_user_token \
+  Kong-Admin-Token:AdminA_token
+
+### curl -sX POST kongcluster:8001/WorkspaceA/rbac/users \
+     -d name=TeamA_engineer \
+     -d user_token=teama_engineer_user_token \
+     -H Kong-Admin-Token:AdminA_token \
+     | jq
+
+http POST kongcluster:8001/WorkspaceB/rbac/users \
+  name=TeamB_engineer \
+  user_token=teamb_engineer_user_token \
+  Kong-Admin-Token:AdminB_token
+
+### curl -sX POST kongcluster:8001/WorkspaceB/rbac/users \
+     -d name=TeamB_engineer \
+     -d user_token=teamb_engineer_user_token \
+     -H Kong-Admin-Token:AdminB_token \
+     | jq
+
+## Task: Create read-only roles and permissions for 'Team_engineer'
+
+http POST kongcluster:8001/WorkspaceA/rbac/roles \
+  name=engineer-role \
+  Kong-Admin-Token:super-admin
+
+### curl -sX POST kongcluster:8001/WorkspaceA/rbac/roles \
+      -d name=engineer-role \
+      -H Kong-Admin-Token:super-admin \
+      | jq
+
+http POST kongcluster:8001/WorkspaceA/rbac/roles/engineer-role/endpoints/ \
+  	endpoint=* \
+  	workspace=WorkspaceA \
+  	actions="read" \
+  	Kong-Admin-Token:AdminA_token
+
+### curl -sX POST kongcluster:8001/WorkspaceA/rbac/roles/engineer-role/endpoints/ \
+  	  -d endpoint=* \
+  	  -d workspace=WorkspaceA \
+  	  -d actions="read" \
+  	  -H Kong-Admin-Token:AdminA_token \
+      | jq
+
+http POST kongcluster:8001/WorkspaceB/rbac/roles \
+  name=engineer-role \
+  Kong-Admin-Token:super-admin
+
+### curl -sX POST kongcluster:8001/WorkspaceB/rbac/roles \
+      -d name=engineer-role \
+      -H Kong-Admin-Token:super-admin \
+      | jq
+
+http POST kongcluster:8001/WorkspaceB/rbac/roles/engineer-role/endpoints/ \
+  endpoint=* \
+  workspace=WorkspaceB \
+  actions="read" \
+  Kong-Admin-Token:AdminB_token
+
+### curl -sX POST kongcluster:8001/WorkspaceB/rbac/roles/engineer-role/endpoints/ \
+  	  -d endpoint=* \
+  	  -d workspace=WorkspaceB \
+  	  -d actions="read" \
+  	  -H Kong-Admin-Token:AdminB_token \
+      | jq
+
+
+## Task: Assign roles and permissions for 'Team_engineer'
+
+http POST kongcluster:8001/WorkspaceA/rbac/users/TeamA_engineer/roles \
+  roles=engineer-role \
+  Kong-Admin-Token:AdminA_token
+
+### curl -sX POST kongcluster:8001/WorkspaceA/rbac/users/TeamA_engineer/roles \
+      -d roles=engineer-role \
+      -H Kong-Admin-Token:AdminA_token \
+      | jq
+
+http POST kongcluster:8001/WorkspaceB/rbac/users/TeamB_engineer/roles \
+  roles=engineer-role \
+  Kong-Admin-Token:AdminB_token
+
+### curl -sX POST kongcluster:8001/WorkspaceB/rbac/users/TeamB_engineer/roles \
+      -d roles=engineer-role \
+      -H Kong-Admin-Token:AdminB_token \
+      | jq
+
+## Task: Verifying Teams Access
+
+http GET kongcluster:8001/WorkspaceA/consumers \
+  Kong-Admin-Token:teama_engineer_user_token
+
+### curl -sX GET kongcluster:8001/WorkspaceA/consumers \
+      -H Kong-Admin-Token:teama_engineer_user_token \
+      | jq
+
+http POST kongcluster:8001/WorkspaceA/consumers \
+  username=Jane \
+  Kong-Admin-Token:teama_engineer_user_token
+
+### curl -sX POST kongcluster:8001/WorkspaceA/consumers \
+      -d username=Jane \
+      -H Kong-Admin-Token:teama_engineer_user_token \
+      | jq
+
+http GET kongcluster:8001/WorkspaceB/consumers \
+  Kong-Admin-Token:teama_engineer_user_token
+
+### curl -sX GET kongcluster:8001/WorkspaceB/consumers \
+      -H Kong-Admin-Token:teama_engineer_user_token \
+      | jq
+
+http GET kongcluster:8001/WorkspaceB/consumers \
+  Kong-Admin-Token:teamb_engineer_user_token
+
+### curl -sX GET kongcluster:8001/WorkspaceB/consumers \
+      -H Kong-Admin-Token:teamb_engineer_user_token \
+      | jq
+
+http POST kongcluster:8001/WorkspaceA/consumers \
+  username=Jane \
+  Kong-Admin-Token:teama_engineer_user_token
+
+### curl -sX POST kongcluster:8001/WorkspaceB/consumers \
+      -d username=Jane \
+      -H Kong-Admin-Token:teamb_engineer_user_token \
+      | jq
+
+http GET kongcluster:8001/WorkspaceB/consumers \
+  Kong-Admin-Token:teama_engineer_user_token
+
+### curl -sX GET kongcluster:8001/WorkspaceA/consumers \
+      -H Kong-Admin-Token:teamb_engineer_user_token \
+      | jq
+
+## Task: Disable RBAC
+
+sed -i 's|\ KONG_ENFORCE_RBAC|#KONG_ENFORCE_RBAC|g' docker-compose.yaml
+sed -i 's|\ KONG_ADMIN_GUI_AUTH|#KONG_ADMIN_GUI_AUTH|g' docker-compose.yaml
+sed -i 's|\ KONG_ADMIN_GUI_SESSION_CONF|#KONG_ADMIN_GUI_SESSION_CONF|g' docker-compose.yaml
+docker-compose stop kong-cp; docker-compose rm -f kong-cp; docker-compose up -d kong-cp
+
+## Securing the Admin API
+
+## Network Layer Access Restrictions
+grep -i admin_listen docker-compose.yaml
+
+## Task: Bring up Kong listening on localhost
+
+cd ~/kong-gateway-operations/installation
+docker-compose down -v
+docker-compose -f kongsecadmin.yaml up -d
+cat kongsecadmin.yaml
+
+## Task: Review Created Service/Route for Admin API
+cat loopback.yaml
+
+## Task: Test Service/Route for Admin API
+
+http GET kongcluster:8001/services
+### curl -sX GET kongcluster:8001/services
+http GET kongcluster:8000/admin-api/services apikey:secret
+### curl -sX GET kongcluster:8000/admin-api/services \
+      -H apikey:secret \
+      | jq

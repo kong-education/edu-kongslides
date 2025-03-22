@@ -3,3 +3,7 @@ dist/
 .nyc_output/
 *.pdf
 /.idea/
+.gitignore
+z_*
+scratch.txt
+scratch/
