@@ -6,5 +6,6 @@ dist/
 .gitignore
 z_*
 scratch.txt
+scratch.md
 scratch/
 KGLL-201

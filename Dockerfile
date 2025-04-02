@@ -11,12 +11,17 @@ USER chrome
 WORKDIR /app
 
 COPY package.json package-lock.json ./
+
 # RUN npm ci --omit=optional --omit=dev
 RUN npm ci --omit=dev
 COPY ./ ./
 
 VOLUME [ "/training-material" ]
 WORKDIR /training-material
+
+# Added by JF
+RUN git init /training-material
+# RUN export GIT_DISCOVERY_ACROSS_FILESYSTEM=1
 
 EXPOSE 8080
 
