@@ -93,6 +93,12 @@ body:lang(en) {
   border: none;
 }
 
+
+code.language-bash {
+  background: black;
+  color: var(--amber) !important;
+}
+
 /*********************************************
  * HEADERS
  *********************************************/

@@ -19,6 +19,7 @@ body {
   --table-font-family: "Open Sans", "Calibri Light", var(--content-font-family);
   --code-font-family: "Menlo", "Monaco", "Courier New", monospace;
   --kong-logo: url("./assets/kong.svg");
+  --amber: #FFBF00;
   --red: #ee2238;
   --red-secondary: #bf1d67;
   --yellow: #f4c042;
