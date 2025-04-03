@@ -194,7 +194,6 @@ body:lang(en) {
   margin: var(--content-block-vertical-margin) 0;
   box-shadow: none;
   border: 1px solid #d9d9d9;
-  padding: 10px 15px;
   width: 100%;
 }
 
@@ -214,6 +213,7 @@ body:lang(en) {
   line-height: normal;
   display: block;
   white-space: pre-wrap;
+  padding: 10px 15px;
 }
 
 .slides section > section:not([class^="page-"]) {
@@ -605,10 +605,6 @@ body:lang(en) .reveal section.page-demo:after {
 .reveal .fa {
   font-family: "FontAwesome";
   font-style: normal;
-}
-
-.reveal pre code {
-  padding: 0;
 }
 
 /** contournement bug chrome et ff qui affichent un fond noir lors du passage en fullscreen : cf https://github.com/hakimel/reveal.js/issues/1386#issuecomment-225379825 */
