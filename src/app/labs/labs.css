@@ -23,11 +23,11 @@ div.pb {
 }
 
 a {
-  color: var(--zenika-blue);
+  color: var(--blue);
 }
 
 a.absent {
-  color: var(--zenika-red);
+  color: var(--red);
 }
 
 a.anchor {

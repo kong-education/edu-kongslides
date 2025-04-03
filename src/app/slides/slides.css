@@ -8,7 +8,7 @@ body {
   background: white;
   --grey: #aaaaaa;
   --default-border-size: 1px;
-  --default-border: var(--default-border-size) solid var(--zenika-red);
+  --default-border: var(--default-border-size) solid var(--red);
   --table-primary-borders: var(--default-border);
   --table-secondary-borders: var(--default-border-size) solid var(--grey);
   --content-block-vertical-margin: 15px;
@@ -156,12 +156,12 @@ body:lang(en) {
  *********************************************/
 
 .reveal em {
-  color: var(--zenika-red);
+  color: var(--red);
   font-style: normal;
 }
 
 .reveal strong {
-  color: var(--zenika-red);
+  color: var(--red);
   font-style: italic;
   font-weight: normal;
 }
@@ -173,7 +173,7 @@ body:lang(en) {
 
 .reveal code {
   font-family: var(--code-font-family);
-  color: var(--zenika-red);
+  color: var(--red);
 }
 
 .reveal blockquote p:first-child,
@@ -194,7 +194,7 @@ body:lang(en) {
   margin: var(--content-block-vertical-margin) 0;
   box-shadow: none;
   border: 1px solid #d9d9d9;
-  border-left: 1px solid var(--zenika-red);
+  border-left: 1px solid var(---red);
   padding: 10px 15px;
   width: 100%;
 }
@@ -274,7 +274,7 @@ body:lang(en) {
 }
 .reveal section[class^="page-tp"]:after {
   display: block;
-  color: var(--zenika-red);
+  color: var(--red);
   font-size: 50px;
   font-weight: bold;
   width: 100%;
@@ -390,7 +390,7 @@ body:lang(en) {
 }
 .reveal section.page-demo:after {
   display: block;
-  color: var(--zenika-red);
+  color: var(--red);
   font-size: 50px;
   font-weight: bold;
   width: 100%;
@@ -413,7 +413,7 @@ body:lang(en) .reveal section.page-demo:after {
  *********************************************/
 
 .reveal a:not(.image) {
-  color: var(--zenika-red);
+  color: var(--red);
   text-decoration: none;
   transition: color 0.15s ease;
 }
@@ -425,14 +425,14 @@ body:lang(en) .reveal section.page-demo:after {
 }
 
 .reveal a:not(.image):hover {
-  color: var(--zenika-red);
+  color: var(--red);
   text-shadow: none;
   border: none;
 }
 
 .reveal .roll span:after {
   color: white;
-  background: var(--zenika-red);
+  background: var(--red);
 }
 
 .reveal .slides .toc a {
@@ -466,38 +466,38 @@ body:lang(en) .reveal section.page-demo:after {
 
 .reveal .controls div.navigate-left,
 .reveal .controls div.navigate-left.enabled {
-  border-right-color: var(--zenika-red);
+  border-right-color: var(--red);
 }
 
 .reveal .controls div.navigate-right,
 .reveal .controls div.navigate-right.enabled {
-  border-left-color: var(--zenika-red);
+  border-left-color: var(--red);
 }
 
 .reveal .controls div.navigate-up,
 .reveal .controls div.navigate-up.enabled {
-  border-bottom-color: var(--zenika-red);
+  border-bottom-color: var(--red);
 }
 
 .reveal .controls div.navigate-down,
 .reveal .controls div.navigate-down.enabled {
-  border-top-color: var(--zenika-red);
+  border-top-color: var(--red);
 }
 
 .reveal .controls div.navigate-left.enabled:hover {
-  border-right-color: var(--zenika-red);
+  border-right-color: var(--red);
 }
 
 .reveal .controls div.navigate-right.enabled:hover {
-  border-left-color: var(--zenika-red);
+  border-left-color: var(--red);
 }
 
 .reveal .controls div.navigate-up.enabled:hover {
-  border-bottom-color: var(--zenika-red);
+  border-bottom-color: var(--red);
 }
 
 .reveal .controls div.navigate-down.enabled:hover {
-  border-top-color: var(--zenika-red);
+  border-top-color: var(--red);
 }
 
 /*********************************************
@@ -509,7 +509,7 @@ body:lang(en) .reveal section.page-demo:after {
 }
 
 .reveal .progress span {
-  background: var(--zenika-red);
+  background: var(--red);
   transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
 }
 
