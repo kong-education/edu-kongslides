@@ -120,7 +120,7 @@ body:lang(en) {
 }
 
 .reveal h1::before {
-  background-image: var(--zenika-logo-monogram);
+  background-image: var(--kong-logo);
   background-size: cover;
   width: 180px;
   height: 180px;
@@ -218,8 +218,8 @@ body:lang(en) {
 }
 
 .slides section > section:not([class^="page-"]) {
-  background-image: url("./assets/zenika-gradient-bar.png"),
-    var(--zenika-logo-monogram);
+  background-image: url("./assets/gradient-bar.svg"),
+    var(--kong-logo);
   --logo-offset-from-border: 50px;
   background-position: top,
     top var(--logo-offset-from-border) right

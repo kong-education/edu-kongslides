@@ -18,6 +18,7 @@ body {
   --header-font-family: "Nunito", "Calibri Light", var(--content-font-family);
   --table-font-family: "Open Sans", "Calibri Light", var(--content-font-family);
   --code-font-family: "Menlo", "Monaco", "Courier New", monospace;
+  --kong-logo: url("./assets/kong.svg");
   --zenika-red: #ee2238;
   --zenika-red-secondary: #bf1d67;
   --zenika-yellow: #f4c042;
@@ -28,7 +29,6 @@ body {
   --zenika-blue-secondary: #4f8df5;
   --zenika-green: #00eb84;
   --zenika-green-secondary: #00e3ec;
-  --zenika-logo-monogram: url("./assets/zenika-logo-monogram.png");
   --zenika-logo-horizontal: url("./assets/zenika-logo-horizontal-black.png");
   --zenika-logo-vertical: url("./assets/zenika-logo-vertical-black.png");
 }
