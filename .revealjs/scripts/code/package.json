@@ -1,0 +1,38 @@
+{
+  "name": "@zenika/sensei",
+  "version": "1.0.0",
+  "scripts": {
+    "prettier": "prettier \"{*,**/*}.{yml,html,css,js}\"",
+    "prettier:check": "npm run prettier -- --check",
+    "prettier:write": "npm run prettier -- --write",
+    "test": "node --test",
+    "start": "node src/cli/cli.js",
+    "dev": "node --watch src/cli/cli.js"
+  },
+  "bin": {
+    "sensei": "src/cli/cli.js"
+  },
+  "dependencies": {
+    "css-loader": "~6.7.3",
+    "decktape": "~3.13.0",
+    "expose-loader": "~4.0.0",
+    "file-loader": "~6.2.0",
+    "get-port": "~6.1.2",
+    "html-loader": "~4.2.0",
+    "html-webpack-plugin": "~5.5.0",
+    "markdown-loader": "~8.0.0",
+    "marked": "~4.2.4",
+    "mini-css-extract-plugin": "~2.7.2",
+    "prismjs": "~1.29.0",
+    "puppeteer": "~22.13.0",
+    "reveal.js": "~4.4.0",
+    "serve-handler": "~6.1.5",
+    "webpack": "~5.94.0",
+    "webpack-bundle-analyzer": "~4.7.0",
+    "webpack-dev-server": "~4.11.1",
+    "yargs": "~17.6.2"
+  },
+  "devDependencies": {
+    "prettier": "~2.8.1"
+  }
+}

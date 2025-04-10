@@ -1,0 +1,6 @@
+courses:
+- class_id: "KGLL-202"
+  exercises:
+  - class_id: "670feefb849d027b2aa4458a"
+    title: "Kong Gateway Installation"
+    IS_ILT: Y

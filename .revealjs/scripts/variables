@@ -1,0 +1,34 @@
+GITHUB_DIR="/Users/john.fitzpatrick@konghq.com/GitHub"
+EDU_COURSE_DIR="$GITHUB_DIR/edu-strigo-courses"
+COURSE_PATH="$EDU_COURSE_DIR"/"$COURSE"
+REVEALJS_DIR="$EDU_COURSE_DIR"/.revealjs
+ARCHIVE_DIR="$REVEALJS_DIR/archive"
+OUTPUT_DIR="$REVEALJS_DIR/output"
+BUCKET_PREFIX="edu-revealjs"
+KONGSLIDES_IMAGE="kongedu/kongslides:1.3"
+
+DEFAULT_COURSE=KGLL-202 # for testing
+CURRENT_CONTAINER=kongslides:1.2
+# NOW=$(date "+%Y-%m-%d")
+NOW=$(date "+%Y%m%d")
+YEAR=$(date +%Y)
+BLUE='\033[34m'
+GREEN='\033[32m'
+RED='\033[0;31m'
+YELLOW='\033[0;33m'
+
+NC='\033[0m' # No Color
+REGION="eu-west-1"
+
+SLIDES_GITHUB_REPO="https://github.com/kong-education/edu-ilt-material" # Not cuurently used
+
+alias kongslides="docker container run --interactive --tty --rm --volume $(pwd):/$(basename $(pwd)) --workdir /$(basename $(pwd)) --publish ${SENSEI_PORT:-8080}:${SENSEI_PORT:-8080} --env SENSEI_PORT --env SENSEI_WATCH_POLL --cap-add=SYS_ADMIN  $KONGSLIDES_IMAGE"
+
+# # To get creds
+# saml2aws configure --profile kong-sandbox-education
+# saml2aws login --profile kong-sandbox-education
+# saml2aws script --profile kong-sandbox-education
+
+# export AWS_ACCESS_KEY_ID="your-access-key-id"
+# export AWS_SECRET_ACCESS_KEY="your-secret-access-key"
+# export AWS_SESSION_TOKEN="your-session-token"  # If using temporary credentials
