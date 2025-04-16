@@ -161,7 +161,8 @@ code.language-bash {
  * CONTENT
  *********************************************/
 
-.reveal em {
+ /* Commented out by John after chat with Fabian 16 April 2025 */
+/* .reveal em {
   color: var(--red);
   font-style: normal;
 }
@@ -170,7 +171,7 @@ code.language-bash {
   color: var(--red);
   font-style: italic;
   font-weight: normal;
-}
+} */
 
 .reveal li {
   margin-top: 0.8em;
@@ -179,7 +180,7 @@ code.language-bash {
 
 .reveal code {
   font-family: var(--code-font-family);
-  color: var(--red);
+  /* color: var(--red); */
 }
 
 .reveal blockquote p:first-child,

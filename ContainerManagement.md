@@ -1,4 +1,8 @@
-docker buildx build --no-cache --platform linux/amd64,linux/arm64 -t kongslides:1.4 . --load
+VERSION=1.5
+docker buildx build --no-cache --platform linux/amd64,linux/arm64 -t kongslides:$VERSION . --load
+docker tag kongslides:$VERSION kongedu/kongslides:$VERSION
+docker push kongedu/kongslides:$VERSION
+
 alias kongslides='docker container run \
    --interactive \
    --tty \
@@ -9,12 +13,10 @@ alias kongslides='docker container run \
    --env SENSEI_PORT \
    --env SENSEI_WATCH_POLL \
    --cap-add=SYS_ADMIN \
-   kongslides:1.4'
+   kongslides:$VERSION'
 
 kongslides serve --material KGLL-202
 
 
-My directory /foo/ID-pdf/pdf contains two PDF files, and I want to copy them to the dir /foo/ID-slides/. Why does this not work
 
-"cp /foo/ID-pdf/pdf /foo/ID-slides"
 
