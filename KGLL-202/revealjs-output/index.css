@@ -1,0 +1,77 @@
+@font-face {
+  font-family: "Nunito";
+  src: url(static-assets/Nunito-Bold-7ddd6722d49bf5270cf1..ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "Open Sans";
+  src: url(static-assets/OpenSans-Regular-ca49d2b01cf4405e2c90..ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "Menlo";
+  src: url(static-assets/Menlo-Regular-92e41f43900c256f2286..ttf) format("truetype");
+}
+
+body {
+  --content-font-family: "Open Sans", "Calibri", sans-serif;
+  --header-font-family: "Nunito", "Calibri Light", var(--content-font-family);
+  --table-font-family: "Open Sans", "Calibri Light", var(--content-font-family);
+  --code-font-family: "Menlo", "Monaco", "Courier New", monospace;
+  --zenika-red: #ee2238;
+  --zenika-red-secondary: #bf1d67;
+  --zenika-yellow: #f4c042;
+  --zenika-yellow-secondary: #eb8581;
+  --zenika-purple: #a188ef;
+  --zenika-purple-secondary: #7c86e9;
+  --zenika-blue: #4ca8e7;
+  --zenika-blue-secondary: #4f8df5;
+  --zenika-green: #00eb84;
+  --zenika-green-secondary: #00e3ec;
+  /* --zenika-logo-monogram: url("./assets/zenika-Logomark-mono.png");
+  --zenika-logo-horizontal: url("./assets/zenika-logo-horizontal-black.png");
+  --zenika-logo-vertical: url("./assets/zenika-logo-vertical-black.png"); */
+  --kong-logo-monogram: url(static-assets/Kong-Logomark-mono-879c0b48b27eb7bc7e92..png);
+  --kong-logo-horizontal: url(static-assets/Kong-Logotype-horizontal-755faf055f6582ea91bc..png);
+  --kong-logo-vertical: url(static-assets/Kong-Logomark-mono-879c0b48b27eb7bc7e92..png);
+}
+
+body,
+html {
+  height: 100%;
+  padding-top: 5%;
+  text-align: center;
+  font-family: var(--header-font-family);
+}
+
+a {
+  color: #333333;
+  text-decoration: none;
+}
+
+.links {
+  display: inline-flex;
+  padding: 50px;
+}
+
+.link {
+  margin: 50px;
+  font-size: 3em;
+  display: flex;
+  flex-direction: column;
+}
+
+.sub-link {
+  font-size: 40%;
+}
+
+.sub-link[href=""] {
+  display: none;
+}
+
+#github.sub-link::before {
+  content: url(static-assets/GitHub-Mark-32px-0035c307a36c17babb8d..png);
+  padding-right: 5px;
+  vertical-align: -0.5em;
+}
+
