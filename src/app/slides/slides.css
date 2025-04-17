@@ -1,5 +1,14 @@
 @import url("../global.css");
 
+/* # Afer talking to fabian */
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+	background: inherit !important;
+}
+
 /*********************************************
  * GLOBAL STYLES
  *********************************************/
@@ -82,10 +91,16 @@ body:lang(en) {
   border: var(--table-secondary-borders);
 }
 
-.reveal .slides table tr th {
+/* .reveal .slides table tr th {
   border: var(--table-secondary-borders);
   border-bottom: var(--table-primary-borders);
-}
+} */
+
+.reveal .slides table tr th {
+  border: var(--table-secondary-borders);
+  /* border-bottom: var(--table-primary-borders); */
+  background-color: #f5f5f5; 
+  }
 
 .reveal .slides table.no-border,
 .reveal .slides table.no-border tr td,
@@ -165,13 +180,14 @@ code.language-bash {
 /* .reveal em {
   color: var(--red);
   font-style: normal;
-}
+} */
 
 .reveal strong {
-  color: var(--red);
-  font-style: italic;
-  font-weight: normal;
-} */
+  /* color: var(--red);
+  font-style: italic; */
+  /* font-weight: normal; */
+  font-weight: bold;
+}
 
 .reveal li {
   margin-top: 0.8em;
