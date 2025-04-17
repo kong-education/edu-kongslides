@@ -3,3 +3,4 @@ dist/
 .nyc_output/
 *.pdf
 /.idea/
+.revealjs/output/*
