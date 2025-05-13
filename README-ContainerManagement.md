@@ -1,4 +1,4 @@
-VERSION=1.6.1
+VERSION=1.6.2
 docker buildx build --no-cache --platform linux/amd64,linux/arm64 -t kongslides:$VERSION . --load
 docker tag kongslides:$VERSION kongedu/kongslides:$VERSION
 docker push kongedu/kongslides:$VERSION
