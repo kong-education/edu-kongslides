@@ -1,1 +1,1 @@
-export { title } from "training-material/Slides/slides.json";
+export { title } from "training-material/slides/slides.json";

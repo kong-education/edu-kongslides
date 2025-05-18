@@ -81,7 +81,7 @@ module.exports = (env = {}, argv = {}) => {
           ],
         },
         {
-          test: /[\/\\](Workbook|CahierExercices|Slides)[\/\\].+\.md$/,
+          test: /[\/\\](workbook|CahierExercices|slides)[\/\\].+\.md$/,
           type: "asset/source",
         },
         {
@@ -117,13 +117,13 @@ module.exports = (env = {}, argv = {}) => {
         "node_modules",
       ],
       fallback: {
-        "training-material/Workbook/workbook.json":
-          "training-material/Workbook/parts.json",
-        "training-material/Workbook/parts.json":
+        "training-material/workbook/workbook.json":
+          "training-material/workbook/parts.json",
+        "training-material/workbook/parts.json":
           "training-material/CahierExercices/parts.json",
-        "training-material/Slides/resources/custom.css":
-          "training-material/Slides/ressources/custom.css",
-        "training-material/Slides/ressources/custom.css": false,
+        "training-material/slides/resources/custom.css":
+          "training-material/slides/ressources/custom.css",
+        "training-material/slides/ressources/custom.css": false,
       },
     },
     output: {

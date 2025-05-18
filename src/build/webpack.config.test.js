@@ -165,7 +165,7 @@ function setupFakeMaterial(
     path.join(os.tmpdir(), `sensei_webpack.config.test.js_${folderLabel}_`)
   );
   const input = path.join(sandbox, "input");
-  const slidesFolder = path.join(input, "Slides");
+  const slidesFolder = path.join(input, "slides");
   fs.mkdirSync(slidesFolder, { recursive: true });
   fs.writeFileSync(
     path.join(slidesFolder, "slides.json"),
@@ -174,7 +174,7 @@ function setupFakeMaterial(
   slides.forEach(({ file, content = "" }) =>
     fs.writeFileSync(path.join(slidesFolder, file), content)
   );
-  const workbookFolder = path.join(input, "Workbook");
+  const workbookFolder = path.join(input, "workbook");
   fs.mkdirSync(workbookFolder, { recursive: true });
   fs.writeFileSync(
     path.join(workbookFolder, "workbook.json"),
