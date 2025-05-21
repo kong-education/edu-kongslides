@@ -3,6 +3,8 @@ import revealPluginNotes from "reveal.js/plugin/notes/notes.js";
 import revealPluginZoom from "reveal.js/plugin/zoom/zoom.js";
 import revealPluginMathJax from "reveal.js/plugin/math/math.js";
 import RevealMermaid from "reveal.js-mermaid-plugin/plugin/mermaid/mermaid.js";
+import CopyCode from "reveal.js-copycode";
+
 import 'reveal.js-copycode/plugin/copycode/copycode.css';
 import "reveal.js/dist/reveal.css";
 import "prismjs/themes/prism.css";
@@ -48,6 +50,7 @@ reveal.initialize({
     revealPluginNotes,
     revealPluginZoom,
     RevealMermaid,
+    CopyCode
   ],
   math: {
     tex2jax: { inlineMath: [["\\(", "\\)"]] },
