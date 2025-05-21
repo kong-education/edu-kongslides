@@ -11,6 +11,14 @@ import "prismjs/themes/prism.css";
 import "./slides.css";
 import "training-material/Slides/resources/custom.css";
 
+// custom code to disable copy-to-clipboard functionality
+document.querySelectorAll('pre code.language-shell').forEach((block) => {
+  const sibling = block.closest('pre')
+  if (sibling) {
+    sibling.dataset.cc = "false";
+  }
+});
+
 reveal.initialize({
   controls: true,
   progress: true,
