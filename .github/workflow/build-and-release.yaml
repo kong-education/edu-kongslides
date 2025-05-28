@@ -1,26 +1,27 @@
 name: Build, Tag, and Push Docker Image
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches:
-      - automation
+      - main
+    paths:
+      - 'src/**'
+      - 'package.json'
   workflow_dispatch:
 
 jobs:
   build-and-push:
-    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write  # Needed to push tags/releases
+      contents: write
       packages: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Required for tag detection
+          fetch-depth: 0
 
       - name: Bump version and create GitHub release
         id: tag_release
@@ -30,7 +31,7 @@ jobs:
           tag_prefix: v
           default_bump: patch
 
-      - name: Set VERSION from created tag
+      - name: Set VERSION from tag
         run: echo "VERSION=${{ steps.tag_release.outputs.new_tag }}" >> $GITHUB_ENV
 
       - name: Set up Docker Buildx
@@ -48,7 +49,7 @@ jobs:
             --platform linux/amd64,linux/arm64 \
             -t kongslides:${VERSION} . --load
 
-      - name: Tag and push image
+      - name: Tag and push to Docker Hub
         run: |
           docker tag kongslides:${VERSION} kongedu/kongslides:${VERSION}
           docker push kongedu/kongslides:${VERSION}
