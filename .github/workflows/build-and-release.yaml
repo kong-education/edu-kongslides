@@ -1,9 +1,8 @@
-name: Build, Tag, and Push Docker Image
-
+name: Build Kongslides Image
 on:
   push:
     branches:
-      - main
+      - automation
     paths:
       - 'src/**'
       - 'package.json'
