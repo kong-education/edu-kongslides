@@ -1,0 +1,55 @@
+name: Build, Tag, and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'package.json'
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Bump version and create GitHub release
+        id: tag_release
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag_prefix: v
+          default_bump: patch
+
+      - name: Set VERSION from tag
+        run: echo "VERSION=${{ steps.tag_release.outputs.new_tag }}" >> $GITHUB_ENV
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and load Docker image
+        run: |
+          docker buildx build --no-cache \
+            --platform linux/amd64,linux/arm64 \
+            -t kongslides:${VERSION} . --load
+
+      - name: Tag and push to Docker Hub
+        run: |
+          docker tag kongslides:${VERSION} kongedu/kongslides:${VERSION}
+          docker push kongedu/kongslides:${VERSION}
