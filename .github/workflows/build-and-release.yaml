@@ -1,4 +1,5 @@
 name: Build Kongslides Image
+
 on:
   push:
     branches:
@@ -42,13 +43,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and load Docker image
+      - name: Build and push multi-arch Docker image
         run: |
           docker buildx build --no-cache \
             --platform linux/amd64,linux/arm64 \
-            -t kongslides:${VERSION} . --load
-
-      - name: Tag and push to Docker Hub
-        run: |
-          docker tag kongslides:${VERSION} kongedu/kongslides:${VERSION}
-          docker push kongedu/kongslides:${VERSION}
+            -t kongedu/kongslides:${VERSION} \
+            -t kongedu/kongslides:latest \
+            . --push
