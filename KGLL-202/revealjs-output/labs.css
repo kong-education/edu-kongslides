@@ -304,6 +304,16 @@ h6 {
   font-size: 14px;
 }
 
+
+/* Added by JohnF 5/8/25 to have a h1 on a new page */
+@media print {
+  h1 {
+    break-before: page;
+    page-break-before: always;
+  }
+}
+/* Above by JohnF 5/8/25 to have a h1 on a new page */
+
 p,
 blockquote,
 ul,
