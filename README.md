@@ -70,7 +70,8 @@ Therefore it is recommended to clone the training repository in the Linux filesy
 ### Using Node.js
 
 - Install with `npm install --global https://github.com/kong-education/edu-kongslides`
-#- Install with `npm install --global https://github.com/Zenika/sensei`
+  
+(Was `npm install --global https://github.com/Zenika/sensei`)
 
 > ⚠ You may use Yarn, however it's been known to have cache issues when
 > installing packages from GitHub, resulting in failures to update sensei
