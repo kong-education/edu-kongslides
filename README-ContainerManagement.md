@@ -1,7 +1,13 @@
-VERSION=1.6.1
-docker buildx build --no-cache --platform linux/amd64,linux/arm64 -t kongslides:$VERSION . --load
+VERSION=1.7.1  # New Branding
+<!-- docker buildx build --no-cache --platform linux/amd64,linux/arm64 -t kongslides:$VERSION . --load -->
+docker buildx build --platform linux/amd64,linux/arm64 -t kongslides:$VERSION . --load
 docker tag kongslides:$VERSION kongedu/kongslides:$VERSION
 docker push kongedu/kongslides:$VERSION
+
+
+<!-- docker tag kongslides:$VERSION johnfitzpatrick/kongslides:$VERSION
+docker push johnfitzpatrick/kongslides:$VERSION -->
+
 
 alias kongslides='docker container run \
    --interactive \
@@ -17,6 +23,13 @@ alias kongslides='docker container run \
 
 kongslides serve --material KGLL-202
 
+
+# To share a docker image without going through dockerhub
+## Save image to a tar file
+docker save kongslides:$VERSION -o kongslides_$VERSION.tar
+
+## Load it on another machine
+docker load -i kongslides_$VERSION.tar
 
 
 

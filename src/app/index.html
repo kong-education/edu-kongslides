@@ -7,10 +7,8 @@
 
   <body>
     <div>
-      <img
-        width="180px"
-        src="<%- require('./assets/kong.svg') %>"
-      />
+      <!-- <img width="180px" src="<%- require('./assets/kong.svg') %>" /> -->
+      <img width="180px" src="<%- require('./assets/Kong-Logomark.png') %>" />
       <h1><%= require('./content.js').title %></h1>
       <span>Version <%- htmlWebpackPlugin.options.materialVersion %></span>
     </div>
@@ -18,8 +16,8 @@
       <div class="link">
         <a href="slides.html#/">👩‍🏫 Slides</a>
         <a
-        href="./KongEdu-<%- htmlWebpackPlugin.options.trainingSlug %>-Slides.pdf"
-        class="sub-link"
+          href="./KongEdu-<%- htmlWebpackPlugin.options.trainingSlug %>-Slides.pdf"
+          class="sub-link"
           >📄 PDF</a
         >
       </div>

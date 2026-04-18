@@ -6,7 +6,7 @@
 .token.url,
 .language-css .token.string,
 .style .token.string {
-	background: inherit !important;
+  background: inherit !important;
 }
 
 /*********************************************
@@ -99,15 +99,14 @@ body:lang(en) {
 .reveal .slides table tr th {
   border: var(--table-secondary-borders);
   /* border-bottom: var(--table-primary-borders); */
-  background-color: #f5f5f5; 
-  }
+  background-color: #f5f5f5;
+}
 
 .reveal .slides table.no-border,
 .reveal .slides table.no-border tr td,
 .reveal .slides table.no-border tr th {
   border: none;
 }
-
 
 code.language-bash {
   background: black;
@@ -176,7 +175,7 @@ code.language-bash {
  * CONTENT
  *********************************************/
 
- /* Commented out by John after chat with Fabian 16 April 2025 */
+/* Commented out by John after chat with Fabian 16 April 2025 */
 /* .reveal em {
   color: var(--red);
   font-style: normal;
@@ -240,8 +239,8 @@ code.language-bash {
 }
 
 .slides section > section:not([class^="page-"]) {
-  background-image: url("./assets/gradient-bar.svg"),
-    var(--kong-logo);
+  /* background-image: url("./assets/gradient-bar.svg"), var(--kong-logo); */
+  background-image: url("./assets/gradient-bar-updated-v2.svg"), var(--kong-logo);
   --logo-offset-from-border: 50px;
   background-position: top,
     top var(--logo-offset-from-border) right
