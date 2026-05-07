@@ -49,6 +49,12 @@ window.alert("test");
 window.alert("test");
 </script>
 ```
+```shell
+// SHELL
+<script>
+window.alert("test");
+</script>
+```
 
 Direct:
 <script>
