@@ -2,10 +2,22 @@ import reveal from "reveal.js/dist/reveal.js";
 import revealPluginNotes from "reveal.js/plugin/notes/notes.js";
 import revealPluginZoom from "reveal.js/plugin/zoom/zoom.js";
 import revealPluginMathJax from "reveal.js/plugin/math/math.js";
+import RevealMermaid from "reveal.js-mermaid-plugin/plugin/mermaid/mermaid.js";
+import CopyCode from "reveal.js-copycode";
+
+import 'reveal.js-copycode/plugin/copycode/copycode.css';
 import "reveal.js/dist/reveal.css";
 import "prismjs/themes/prism.css";
 import "./slides.css";
 import "training-material/Slides/resources/custom.css";
+
+// custom code to disable copy-to-clipboard functionality
+document.querySelectorAll('pre code.language-shell').forEach((block) => {
+  const sibling = block.closest('pre')
+  if (sibling) {
+    sibling.dataset.cc = "false";
+  }
+});
 
 reveal.initialize({
   controls: true,
@@ -40,7 +52,14 @@ reveal.initialize({
   margin: 0,
   width: SLIDE_WIDTH,
   height: SLIDE_HEIGHT,
-  plugins: [revealPluginMathJax, revealPluginNotes, revealPluginZoom],
+  // plugins: [revealPluginMathJax, revealPluginNotes, revealPluginZoom],
+  plugins: [
+    revealPluginMathJax,
+    revealPluginNotes,
+    revealPluginZoom,
+    RevealMermaid,
+    CopyCode
+  ],
   math: {
     tex2jax: { inlineMath: [["\\(", "\\)"]] },
   },
