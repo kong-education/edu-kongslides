@@ -1,6 +1,8 @@
 import "prismjs/themes/prism.css";
 import "./labs.css";
 import { title } from "./content.js";
+import 'reveal.js-copycode/plugin/copycode/copycode.css';
+
 
 const labsContainer = document.getElementById("labs-container");
 const { version } = labsContainer.dataset;

@@ -4,3 +4,5 @@ dist/
 *.pdf
 /.idea/
 .revealjs/output/*
+.DS_Store
+*tar

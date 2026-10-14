@@ -1,16 +1,19 @@
 @font-face {
   font-family: "Nunito";
-  src: url(static-assets/Nunito-Bold-7ddd6722d49bf5270cf1..ttf) format("truetype");
+  src: url(static-assets/Nunito-Bold-7ddd6722d49bf5270cf1..ttf)
+    format("truetype");
 }
 
 @font-face {
   font-family: "Open Sans";
-  src: url(static-assets/OpenSans-Regular-ca49d2b01cf4405e2c90..ttf) format("truetype");
+  src: url(static-assets/OpenSans-Regular-ca49d2b01cf4405e2c90..ttf)
+    format("truetype");
 }
 
 @font-face {
   font-family: "Menlo";
-  src: url(static-assets/Menlo-Regular-92e41f43900c256f2286..ttf) format("truetype");
+  src: url(static-assets/Menlo-Regular-92e41f43900c256f2286..ttf)
+    format("truetype");
 }
 
 body {
@@ -74,4 +77,3 @@ a {
   padding-right: 5px;
   vertical-align: -0.5em;
 }
-

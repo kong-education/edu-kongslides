@@ -11,7 +11,9 @@ USER chrome
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
+# RUN npm ci --omit=dev
+RUN npm ci --omit=dev --omit=optional
+
 COPY ./ ./
 
 VOLUME [ "/training-material" ]
