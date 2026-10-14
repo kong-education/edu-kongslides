@@ -5,3 +5,4 @@ dist/
 /.idea/
 .revealjs/output/*
 .DS_Store
+*tar
