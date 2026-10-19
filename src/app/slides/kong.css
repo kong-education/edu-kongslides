@@ -541,3 +541,11 @@ html, body { background: var(--bg); }
 @media (prefers-reduced-motion: reduce) {
   .reveal .slides section, .reveal .fragment { transition: none !important; }
 }
+
+/* MERMAID ON DARK SLIDES -------------------------------------------------
+   slides.js passes a light palette to Mermaid for .theme-dark slides. Sequence
+   diagram lifelines are the one thing that palette can't reach: Mermaid emits
+   them as <line stroke="#999" class="200"> (no .actor-line class), so they are
+   restyled here. Scoped to .theme-dark; light slides keep Mermaid's default.
+   ------------------------------------------------------------------------ */
+.theme-dark .mermaid svg line[id^="actor"] { stroke: #c8d0c8 !important; }

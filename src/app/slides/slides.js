@@ -31,6 +31,57 @@ document.querySelectorAll('pre code.language-mermaid').forEach((block) => {
   pre.replaceWith(div);
 });
 
+// Mermaid is themed per slide, at render time. Dark slides (theme-dark, the default)
+// get a light edge/arrow palette so connectors stay visible on the navy background;
+// light slides keep Mermaid's default look untouched. The slide markdown is never
+// modified: the choice is made here and passed to Mermaid as an init directive on the
+// diagram text just before it renders (reveal.js-mermaid-plugin's beforeRender hook).
+const MERMAID_DARK_VARS = {
+  // Node boxes keep Mermaid's default look...
+  primaryColor: "#ECECFF",
+  primaryBorderColor: "#9370DB",
+  primaryTextColor: "#131300",
+  // ...while connectors, arrowheads and free text read on a dark background.
+  lineColor: "#c8d0c8",
+  textColor: "#e8eee8",
+  // Sequence diagrams: message lines/arrowheads and lifelines (edge labels keep
+  // Mermaid's light chip, which already reads on dark).
+  signalColor: "#c8d0c8",
+  signalTextColor: "#e8eee8",
+  actorLineColor: "#c8d0c8",
+};
+
+function luminance(color) {
+  const hex = color.trim().match(/^#([0-9a-f]{6})$/i);
+  const rgb = hex
+    ? [0, 2, 4].map((i) => parseInt(hex[1].substr(i, 2), 16))
+    : (color.match(/\d+(\.\d+)?/g) || [255, 255, 255]).slice(0, 3).map(Number);
+  const [r, g, b] = rgb.map((v) => {
+    v /= 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+function isDarkSlide(el) {
+  const section = el.closest("section");
+  const cls = section ? section.className : "";
+  if (/theme-dark/.test(cls)) return true;
+  if (/theme-(electric|bay|white)/.test(cls)) return false;
+  // No theme class: judge by the --bg the slide would get (the stylesheet default is dark).
+  const bg = getComputedStyle(section || el).getPropertyValue("--bg");
+  return bg ? luminance(bg) < 0.4 : true;
+}
+
+function mermaidBeforeRender(el) {
+  const source = el.textContent.trim();
+  if (!isDarkSlide(el)) return;
+  // A diagram that sets its own config (init directive or frontmatter) keeps it.
+  if (/^(---|%%\{)/.test(source)) return;
+  const init = JSON.stringify({ theme: "base", themeVariables: MERMAID_DARK_VARS });
+  el.textContent = `%%{init: ${init}}%%\n${source}`;
+}
+
 // Kong brand chrome: default theme class, logo and registration marks on every slide.
 // Must run before reveal.initialize. Add class="no-chrome" to a slide to skip the logo.
 (function addKongChrome() {
@@ -105,6 +156,7 @@ reveal.initialize({
   math: {
     tex2jax: { inlineMath: [["\\(", "\\)"]] },
   },
+  mermaidPlugin: { beforeRender: mermaidBeforeRender },
 });
 
 function hasRemoteQueryParameter() {
