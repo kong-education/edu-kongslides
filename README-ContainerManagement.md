@@ -1,9 +1,11 @@
 <!-- VERSION=1.7.1  # New Branding -->
-VERSION=1.7.2  # Including mermaid and copy-code (but this is switched off)
+<!-- VERSION=1.7.2  # Including mermaid and copy-code (but this is switched off) -->
+VERSION=1.7.3 # Includes Chuca's branding
+
 <!-- docker buildx build --no-cache --platform linux/amd64,linux/arm64 -t kongslides:$VERSION . --load -->
 docker buildx build --platform linux/amd64,linux/arm64 -t kongslides:$VERSION . --load
 docker tag kongslides:$VERSION kongedu/kongslides:$VERSION
-docker push kongedu/kongslides:$VERSION
+# docker push kongedu/kongslides:$VERSION # This repo has been removed from Docker Hub
 
 
 <!-- docker tag kongslides:$VERSION johnfitzpatrick/kongslides:$VERSION

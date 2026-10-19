@@ -10,6 +10,7 @@ import "reveal.js/dist/reveal.css";
 import "prismjs/themes/prism.css";
 import "./slides.css";
 import "training-material/Slides/resources/custom.css";
+import "./kong.css"; // must load after reveal.css and the other theme css
 
 // custom code to disable copy-to-clipboard functionality
 document.querySelectorAll('pre code.language-shell').forEach((block) => {
@@ -29,6 +30,36 @@ document.querySelectorAll('pre code.language-mermaid').forEach((block) => {
   div.textContent = block.textContent;
   pre.replaceWith(div);
 });
+
+// Kong brand chrome: default theme class, logo and registration marks on every slide.
+// Must run before reveal.initialize. Add class="no-chrome" to a slide to skip the logo.
+(function addKongChrome() {
+  const W = 1920, H = 1080, m = 40;
+  const c = (x, y) => `M${x - 14} ${y}H${x + 14}M${x} ${y - 14}V${y + 14}`;
+  const tSide = (x, y, d) => `M${x} ${y - 14}V${y + 14}M${x} ${y}H${x + d * 24}`;
+  const marks = [
+    c(m, m), c(W - m, m), c(m, H - m), c(W - m, H - m),
+    `M${W / 2 - 14} ${m}H${W / 2 + 14}M${W / 2} ${m}V${m + 24}`,
+    `M${W / 2 - 14} ${H - m}H${W / 2 + 14}M${W / 2} ${H - m}V${H - m - 24}`,
+    tSide(m, H / 2, 1), tSide(W - m, H / 2, -1),
+  ].join("");
+  const chrome =
+    '<div class="kong-chrome" aria-hidden="true">' +
+    '<svg class="kong-logo"><use href="#kong-logo"/></svg>' +
+    `<svg class="kong-marks" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><path d="${marks}"/></svg>` +
+    "</div>";
+
+  document.querySelectorAll(".reveal .slides section").forEach((s) => {
+    if (s.querySelector("section")) return; // vertical stack parent
+    let theme = (s.className.match(/theme-(dark|electric|bay|white)/) || [])[0];
+    if (!theme) {
+      theme = "theme-dark";
+      s.classList.add(theme);
+    }
+    if (!s.hasAttribute("data-state")) s.setAttribute("data-state", theme);
+    if (!s.classList.contains("no-chrome")) s.insertAdjacentHTML("afterbegin", chrome);
+  });
+})();
 
 reveal.initialize({
   controls: true,

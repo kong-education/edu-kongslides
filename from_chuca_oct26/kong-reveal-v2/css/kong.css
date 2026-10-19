@@ -1,0 +1,542 @@
+/* ==========================================================================
+   KONG — reveal.js theme
+   Source: Kong Brand Guidelines v1.2
+   Canvas: 1920 x 1080 (set in Reveal.initialize). All sizes are in canvas px.
+   Load AFTER reveal.css. Replaces the stock theme file.
+
+   Structure
+   1. Tokens (brand primitives)
+   2. Themes   (.theme-dark | .theme-electric | .theme-bay | .theme-white)
+   3. reveal.js variable mapping
+   4. Backgrounds (blueprint grid)
+   5. Slide frame + chrome (logo, registration marks)
+   6. Typography
+   7. Components (label, pill, button, card, stat, cols, flow, code, statement)
+   8. reveal UI (slide number, controls, progress)
+   ========================================================================== */
+
+
+/* 1. TOKENS ------------------------------------------------------------- */
+:root {
+  /* Primary palette */
+  --kong-navy:  #001408;   /* Navy Green  */
+  --kong-lime:  #CCFF00;   /* Electric Lime */
+  --kong-bay:   #CDD4CB;   /* Bay */
+  --kong-white: #FFFFFF;
+
+  /* Warm-green grayscale */
+  --g50:  #E7EDE5;
+  --g100: #D7DED4;
+  --g200: #CDD4CB;
+  --g300: #B7BDB5;
+  --g400: #A1A69F;
+  --g500: #858983;
+  --g600: #676B66;
+  --g700: #4A4D49;
+  --g800: #2D2E2C;
+  --g900: #101110;
+
+  /* Type */
+  --font-sans: 'Funnel Sans', system-ui, sans-serif;
+  --font-mono: 'Roboto Mono', monospace;
+
+  /* Brand type scale x1.5 (guideline px -> 1920 canvas) */
+  --t-xl:    108px;   /* Heading XL  72/78  */
+  --t-l:      48px;   /* Heading L   32/38  */
+  --t-m:      36px;   /* Heading M   24/30  */
+  --t-body:   30px;   /* Body L      20/28  */
+  --t-small:  21px;   /* Body S      14/16  */
+  --t-label:  16.5px; /* Section label 11/14 */
+  --t-code:   19.5px; /* Code        13/20  */
+
+  /* Layout: 8px base, doubled for the canvas */
+  --u:        16px;
+  --pad-x:   120px;
+  --pad-top: 200px;   /* clears the logo */
+  --pad-bot: 140px;
+  --gutter:   48px;
+
+  --radius-card: 16px;
+  --radius-code: 8px;
+}
+
+
+/* 2. THEMES -------------------------------------------------------------
+   Applied to <section class="theme-*"> and mirrored on .slide-background
+   and <html> (through data-state), so slide, background and reveal UI
+   all switch together. Dark is the default.
+   ------------------------------------------------------------------------ */
+:root,
+.theme-dark {
+  --bg:         var(--kong-navy);
+  --fg:         var(--kong-white);
+  --fg-2:       var(--kong-bay);
+  --accent:     var(--kong-lime);     /* lime as TEXT color */
+  --fill:       var(--kong-lime);     /* lime as FILL (pills, buttons) */
+  --on-fill:    var(--kong-navy);
+  --logo:       var(--kong-lime);
+  --line:       #313919;              /* grid + structural lines */
+  --cross:      #54660A;              /* registration marks */
+  --line-strong:#54660A;              /* card borders */
+  --card:       rgba(204, 255, 0, .04);
+  --conn:       rgba(204, 255, 0, .6);
+  --dot:        var(--kong-lime);
+  --code-bg:    rgba(255, 255, 255, .05);
+  --glow:       0 0 48px #CCFF0040;
+}
+
+.theme-electric {
+  --bg:         var(--kong-lime);
+  --fg:         var(--kong-navy);
+  --fg-2:       rgba(0, 20, 8, .72);
+  --accent:     var(--kong-navy);
+  --fill:       var(--kong-navy);
+  --on-fill:    var(--kong-lime);
+  --logo:       var(--kong-navy);
+  --line:       rgba(0, 20, 8, .14);
+  --cross:      rgba(0, 20, 8, .55);
+  --line-strong:rgba(0, 20, 8, .4);
+  --card:       rgba(0, 20, 8, .06);
+  --conn:       rgba(0, 20, 8, .55);
+  --dot:        var(--kong-navy);
+  --code-bg:    var(--kong-navy);
+  --glow:       none;
+}
+
+.theme-bay {
+  --bg:         var(--kong-bay);
+  --fg:         var(--kong-navy);
+  --fg-2:       var(--g700);
+  --accent:     var(--kong-navy);     /* lime text fails contrast on light */
+  --fill:       var(--kong-navy);
+  --on-fill:    var(--kong-lime);
+  --logo:       var(--kong-lime);     /* per guideline: lime lockup on Bay */
+  --line:       #AEB5A7;
+  --cross:      #4B4E46;
+  --line-strong:var(--g500);
+  --card:       rgba(255, 255, 255, .35);
+  --conn:       rgba(0, 20, 8, .55);
+  --dot:        var(--kong-navy);
+  --code-bg:    var(--kong-navy);
+  --glow:       none;
+}
+
+.theme-white {
+  --bg:         var(--kong-white);
+  --fg:         var(--kong-navy);
+  --fg-2:       var(--g600);
+  --accent:     var(--kong-navy);
+  --fill:       var(--kong-navy);
+  --on-fill:    var(--kong-lime);
+  --logo:       var(--g500);          /* per guideline: gray lockup on White */
+  --line:       #AEB5A7;
+  --cross:      #4B4E46;
+  --line-strong:var(--g500);
+  --card:       var(--g50);
+  --conn:       rgba(0, 20, 8, .55);
+  --dot:        var(--kong-navy);
+  --code-bg:    var(--kong-navy);
+  --glow:       none;
+}
+
+
+/* 3. REVEAL VARIABLE MAPPING --------------------------------------------
+   Declared on the same selectors as the themes so var(--fg) etc. resolve
+   per element, not once at :root.
+   ------------------------------------------------------------------------ */
+:root,
+.theme-dark, .theme-electric, .theme-bay, .theme-white {
+  --r-background-color: var(--bg);
+  --r-main-font: var(--font-sans);
+  --r-main-font-size: var(--t-body);
+  --r-main-color: var(--fg);
+  --r-block-margin: 24px;
+  --r-heading-margin: 0 0 24px 0;
+  --r-heading-font: var(--font-sans);
+  --r-heading-color: var(--fg);
+  --r-heading-line-height: 1.08;
+  --r-heading-letter-spacing: -0.02em;
+  --r-heading-text-transform: none;
+  --r-heading-text-shadow: none;
+  --r-heading-font-weight: 800;
+  --r-heading1-size: var(--t-xl);
+  --r-heading2-size: var(--t-l);
+  --r-heading3-size: var(--t-m);
+  --r-heading4-size: var(--t-label);
+  --r-code-font: var(--font-mono);
+  --r-link-color: var(--accent);
+  --r-link-color-hover: var(--accent);
+  --r-link-color-dark: var(--accent);
+  --r-selection-background-color: var(--kong-lime);
+  --r-selection-color: var(--kong-navy);
+}
+
+
+/* 4. BACKGROUNDS --------------------------------------------------------
+   Blueprint grid: 1px lines, 80px cells. Remove per slide with .no-grid.
+   ------------------------------------------------------------------------ */
+html, body { background: var(--bg); }
+
+.reveal .slide-background.theme-dark,
+.reveal .slide-background.theme-electric,
+.reveal .slide-background.theme-bay,
+.reveal .slide-background.theme-white {
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 80px 80px;
+  background-position: center center;
+}
+
+/* Dark gets the subtle radial lift (#000F06 -> #001A0A) */
+.reveal .slide-background.theme-dark {
+  background-image:
+    radial-gradient(60% 90% at 78% 0%, #001A0A 0%, transparent 70%),
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: auto, 80px 80px, 80px 80px;
+}
+
+.reveal .slide-background.no-grid { background-image: none; }
+
+
+/* 5. SLIDE FRAME + CHROME ----------------------------------------------- */
+.reveal { font-family: var(--font-sans); font-weight: 400; }
+
+.reveal .slides section {
+  /* display comes from Reveal config (display: 'flex') */
+  flex-direction: column;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  height: 100%;
+  padding: var(--pad-top) var(--pad-x) var(--pad-bot);
+  text-align: left;
+  color: var(--fg);
+}
+.reveal .slides section.stack { padding: 0; }
+
+.reveal .slides section.v-center { justify-content: center; }
+.reveal .slides section.v-end    { justify-content: flex-end; }
+
+.kong-chrome {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.kong-logo {
+  position: absolute;
+  top: 80px;
+  left: var(--pad-x);
+  height: 56px;
+  width: 56px;                 /* widen to the official lockup's ratio */
+  color: var(--logo);
+  fill: currentColor;
+}
+.kong-marks {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: var(--cross);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+.no-marks .kong-marks { display: none; }
+
+
+/* 6. TYPOGRAPHY --------------------------------------------------------- */
+.reveal h1, .reveal h2, .reveal h3 {
+  font-weight: 800;
+  text-transform: none;
+  letter-spacing: -0.02em;
+  margin: 0 0 24px;
+}
+.reveal h1 { font-size: var(--t-xl); line-height: 1.08; letter-spacing: -0.03em; }
+.reveal h2 { font-size: var(--t-l);  line-height: 1.19; }
+.reveal h3 { font-size: var(--t-m);  line-height: 1.25; font-weight: 700; }
+.reveal h4 {
+  font-size: var(--t-label);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin: 0 0 24px;
+}
+
+.reveal p {
+  margin: 0 0 20px;
+  font-size: var(--t-body);
+  line-height: 1.4;
+  max-width: 24em;               /* keeps lines under ~65 characters */
+}
+.reveal p.lead  { color: var(--fg-2); }
+.reveal p.small { font-size: var(--t-small); line-height: 1.45; color: var(--fg-2); }
+.reveal strong  { font-weight: 800; }
+.reveal a       { color: var(--accent); text-decoration: underline; text-underline-offset: 8px; }
+
+/* Lime accent for key words. Text on dark, marker on light. */
+.reveal .hl { color: var(--kong-lime); }
+.theme-electric .hl, .theme-bay .hl, .theme-white .hl {
+  color: var(--kong-navy);
+  background: var(--kong-lime);
+  padding: 0 .12em;
+}
+.theme-electric .hl { background: var(--kong-navy); color: var(--kong-lime); }
+
+/* Lists: square bullets, no rounded shapes */
+.reveal ul, .reveal ol {
+  display: block;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-width: 28em;
+}
+.reveal ul li, .reveal ol li {
+  position: relative;
+  padding-left: 36px;
+  margin-bottom: 20px;
+  font-size: var(--t-body);
+  line-height: 1.4;
+}
+.reveal ul li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: .55em;
+  width: 10px;
+  height: 10px;
+  background: var(--fill);
+}
+.reveal ol { counter-reset: kong; }
+.reveal ol li { counter-increment: kong; }
+.reveal ol li::before {
+  content: counter(kong, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  font-weight: 700;
+  font-size: var(--t-label);
+  letter-spacing: .1em;
+  top: .45em;
+  color: var(--accent);
+}
+
+
+/* 7. COMPONENTS --------------------------------------------------------- */
+
+/* Section label: uppercase, tracked, 2-color square prefix */
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  font-size: var(--t-label);
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.label::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  background: var(--fill);
+}
+
+/* Pills: standard node (gray), .fill (accent), .ai (dark + lime border) */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  height: 44px;
+  padding: 0 22px;
+  border-radius: 999px;
+  background: var(--g700);
+  color: var(--kong-white);
+  font-size: var(--t-label);
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.pill.fill { background: var(--fill); color: var(--on-fill); }
+.pill.ai   { background: #1A1F1B; color: var(--kong-white); box-shadow: inset 0 0 0 2px var(--kong-lime); }
+.pill-row  { display: flex; gap: 16px; flex-wrap: wrap; }
+
+/* Button: full pill, sentence case */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  height: 58px;
+  padding: 0 34px;
+  border-radius: 999px;
+  background: var(--fill);
+  color: var(--on-fill);
+  font-size: var(--t-small);
+  font-weight: 700;
+  text-decoration: none;
+}
+.reveal a.btn { color: var(--on-fill); text-decoration: none; }
+
+/* Layout grid, 48px gutter */
+.cols {
+  display: grid;
+  grid-template-columns: repeat(var(--n, 2), minmax(0, 1fr));
+  gap: var(--gutter);
+  align-items: stretch;
+  width: 100%;
+}
+.cols-3 { --n: 3; }
+.cols-4 { --n: 4; }
+.cols-2-1 { grid-template-columns: 2fr 1fr; }
+.grow { flex: 1; }
+
+/* Card: border + fill for hierarchy, never shadows */
+.card {
+  box-sizing: border-box;
+  padding: 48px;
+  border: 2px solid var(--line-strong);
+  border-radius: var(--radius-card);
+  background: var(--card);
+}
+.card h3 { margin-bottom: 24px; }
+.card ul li, .card p { font-size: var(--t-small); }
+.card ul li { padding-left: 26px; margin-bottom: 14px; }
+.card ul li::before { width: 8px; height: 8px; }
+
+/* Stat */
+.stat {
+  font-size: 84px;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+  margin-bottom: 24px;
+}
+.stat-label {
+  font-size: var(--t-small);
+  line-height: 1.4;
+  color: var(--fg-2);
+  max-width: 14em;
+}
+
+/* Statement (replaces blockquote chrome) */
+.reveal blockquote, .statement {
+  width: 100%;
+  margin: 0 0 48px;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  border: 0;
+  font-style: normal;
+  font-weight: 800;
+  font-size: 62px;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  max-width: 17em;
+}
+
+/* Flow diagram: pills -> dashed connector -> gateway node -> connector -> pills */
+.flow { display: flex; align-items: center; width: 100%; }
+.flow .stack-col { display: flex; flex-direction: column; gap: 24px; }
+.flow .link {
+  position: relative;
+  flex: 1;
+  min-width: 120px;
+  height: 0;
+  border-top: 4px dashed var(--conn);
+}
+.flow .link::before, .flow .link::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--dot);
+}
+.flow .link::before { left: -6px; }
+.flow .link::after  { right: -6px; }
+.node-gw {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: var(--fill);
+  color: var(--on-fill);
+  box-shadow: var(--glow);
+}
+.node-gw svg { width: 96px; height: 96px; fill: currentColor; }
+.flow-caption {
+  margin-top: 96px;
+  font-size: var(--t-small);
+  color: var(--fg-2);
+}
+
+/* Code block: border + fill, Roboto Mono */
+.reveal pre {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  font-size: var(--t-code);
+  line-height: 1.55;
+  box-shadow: none;
+  background: var(--code-bg);
+  border: 2px solid var(--line-strong);
+  border-radius: var(--radius-code);
+}
+.reveal pre code {
+  display: block;
+  padding: 48px;
+  max-height: none;
+  overflow: auto;
+  background: transparent;
+  color: var(--kong-white);
+  font-family: var(--font-mono);
+  font-weight: 400;
+}
+.reveal code { font-family: var(--font-mono); }
+.reveal p code, .reveal li code {
+  font-size: .8em;
+  padding: .1em .35em;
+  border-radius: 4px;
+  background: var(--code-bg);
+  color: var(--kong-lime);
+}
+/* Syntax tokens: lime + white + grays only */
+.hljs-attr, .hljs-keyword, .hljs-name, .hljs-number,
+.hljs-literal, .hljs-built_in, .hljs-selector-tag { color: var(--kong-lime); }
+.hljs-string, .hljs-title, .hljs-variable          { color: var(--kong-white); }
+.hljs-comment, .hljs-meta                          { color: var(--g500); font-style: normal; }
+.hljs-bullet, .hljs-punctuation                    { color: var(--kong-bay); }
+
+/* Structural rule: dashed, secondary */
+.rule { width: 100%; height: 0; border-top: 2px dashed var(--conn); margin: 48px 0; }
+
+/* Fragments: fast, no travel */
+.reveal .fragment { transition: opacity .2s ease; }
+
+
+/* 8. REVEAL UI ---------------------------------------------------------- */
+.reveal .slide-number {
+  right: 48px;
+  bottom: 40px;
+  background: none;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  color: var(--fg-2);
+}
+.reveal .controls   { color: var(--accent); }
+.reveal .progress   { height: 6px; color: var(--accent); background: transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal .slides section, .reveal .fragment { transition: none !important; }
+}

@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Kong — reveal.js template</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Funnel+Sans:wght@300;400;700;800&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="css/kong.css">
+</head>
+<body>
+
+<!-- ======================================================================
+     LOGO + EMBLEM
+     PLACEHOLDERS. Paste the official SVG paths inside each <symbol> and keep
+     fill="currentColor" so the logo follows the theme color automatically.
+     If you swap in the full lockup, widen .kong-logo in css/kong.css to match
+     its aspect ratio (default is 56 x 56).
+     ====================================================================== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="kong-logo" viewBox="0 0 56 56">
+    <path d="M6 4h12v48H6zM24 28 46 4h8L32 30l22 22h-8z"/>
+  </symbol>
+  <symbol id="kong-emblem" viewBox="0 0 56 56">
+    <path d="M6 4h12v48H6zM24 28 46 4h8L32 30l22 22h-8z"/>
+  </symbol>
+</svg>
+
+<div class="reveal">
+  <div class="slides">
+
+    <!-- 01 · TITLE — Electric -->
+    <section class="theme-electric v-end">
+      <span class="label">AI Connectivity</span>
+      <h1>MCP, but in production.</h1>
+      <p class="lead">The part the spec left for you to discover.</p>
+      <div class="pill-row">
+        <span class="pill fill">Speaker name</span>
+        <span class="pill">Event name</span>
+        <span class="pill">Month DD, 2026</span>
+      </div>
+      <aside class="notes">
+        Press S for the speaker view. Theme is set per slide with a class:
+        theme-dark, theme-electric, theme-bay, theme-white.
+      </aside>
+    </section>
+
+    <!-- 02 · SECTION DIVIDER — Dark -->
+    <section class="theme-dark v-end">
+      <span class="label">Section 01</span>
+      <h1>What breaks first.</h1>
+      <p class="lead">Spoiler: it isn't the model.</p>
+    </section>
+
+    <!-- 03 · BULLETS — Dark -->
+    <section class="theme-dark">
+      <h2>Three things break before the model does.</h2>
+      <ul>
+        <li class="fragment"><strong>Auth.</strong> Every server invents its own.</li>
+        <li class="fragment"><strong>Visibility.</strong> Nobody can say which agent called what.</li>
+        <li class="fragment"><strong>Cost.</strong> Tokens add up quietly, then loudly.</li>
+      </ul>
+    </section>
+
+    <!-- 04 · STATS + CARDS — Dark -->
+    <section class="theme-dark">
+      <span class="label">By the numbers</span>
+      <h2>Replace these with real ones.</h2>
+      <div class="cols cols-3">
+        <div class="card">
+          <div class="stat">00%</div>
+          <div class="stat-label">Describe the metric in one line.</div>
+        </div>
+        <div class="card">
+          <div class="stat">00x</div>
+          <div class="stat-label">Describe the metric in one line.</div>
+        </div>
+        <div class="card">
+          <div class="stat">00ms</div>
+          <div class="stat-label">Describe the metric in one line.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 · DIAGRAM — Dark -->
+    <section class="theme-dark">
+      <span class="label">Architecture</span>
+      <h2>Everything goes through one door.</h2>
+      <div class="flow">
+        <div class="stack-col">
+          <span class="pill">Agents</span>
+          <span class="pill">Apps</span>
+          <span class="pill">Services</span>
+        </div>
+        <div class="link"></div>
+        <div class="node-gw"><svg aria-label="Kong gateway"><use href="#kong-emblem"/></svg></div>
+        <div class="link"></div>
+        <div class="stack-col">
+          <span class="pill ai">OpenAI</span>
+          <span class="pill ai">Anthropic</span>
+          <span class="pill ai">Mistral</span>
+        </div>
+      </div>
+      <p class="flow-caption">One policy layer. Every model, every agent, every call.</p>
+    </section>
+
+    <!-- 06 · CODE — Dark -->
+    <section class="theme-dark">
+      <h2>One plugin. One route.</h2>
+      <pre><code class="language-yaml" data-trim data-noescape>
+plugins:
+  - name: ai-proxy
+    config:
+      route_type: llm/v1/chat
+      auth:
+        header_name: Authorization
+        header_value: Bearer ${OPENAI_KEY}
+      model:
+        provider: openai
+        name: gpt-4o
+      </code></pre>
+    </section>
+
+    <!-- 07 · STATEMENT — Bay -->
+    <section class="theme-bay v-center">
+      <div class="statement">
+        The demo impressed the room. Now someone's asking how to scale it company-wide.
+      </div>
+      <span class="label">That's where it gets complicated</span>
+    </section>
+
+    <!-- 08 · TWO COLUMNS — White -->
+    <section class="theme-white">
+      <h2>Demo vs. production.</h2>
+      <div class="cols">
+        <div class="card">
+          <h3>Demo</h3>
+          <ul>
+            <li>One server, one developer</li>
+            <li>Credentials in a config file</li>
+            <li>Nobody is watching the logs</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Production</h3>
+          <ul>
+            <li>Dozens of servers, many teams</li>
+            <li>Identity and access, enforced centrally</li>
+            <li>Every call traced and costed</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 09 · CLOSING — Electric -->
+    <section class="theme-electric v-end">
+      <span class="label">Thank you</span>
+      <h1>Your turn.</h1>
+      <p class="lead">Questions, objections, war stories.</p>
+      <a class="btn" href="https://konghq.com">konghq.com</a>
+    </section>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script>
+  /* Runs before Reveal.initialize so backgrounds and state are built correctly.
+     - Slides with no theme class default to theme-dark.
+     - data-state mirrors the theme onto <html> so slide number, controls and
+       progress bar follow the slide's theme.
+     - Logo + registration marks are injected on every slide.
+       Add class="no-chrome" to a slide to skip them. */
+  (function () {
+    const marks = (() => {
+      const c = (x, y) => `M${x - 14} ${y}H${x + 14}M${x} ${y - 14}V${y + 14}`;   // cross
+      const tTop = (x, y) => `M${x - 14} ${y}H${x + 14}M${x} ${y}V${y + 24}`;     // tee, top/bottom edges
+      const tSide = (x, y, d) => `M${x} ${y - 14}V${y + 14}M${x} ${y}H${x + d * 24}`; // tee, left/right edges
+      const W = 1920, H = 1080, m = 40;
+      return [
+        c(m, m), c(W - m, m), c(m, H - m), c(W - m, H - m),
+        tTop(W / 2, m), `M${W / 2 - 14} ${H - m}H${W / 2 + 14}M${W / 2} ${H - m}V${H - m - 24}`,
+        tSide(m, H / 2, 1), tSide(W - m, H / 2, -1)
+      ].join('');
+    })();
+
+    const chrome =
+      '<div class="kong-chrome" aria-hidden="true">' +
+        '<svg class="kong-logo"><use href="#kong-logo"/></svg>' +
+        `<svg class="kong-marks" viewBox="0 0 1920 1080" preserveAspectRatio="none"><path d="${marks}"/></svg>` +
+      '</div>';
+
+    document.querySelectorAll('.reveal .slides section').forEach(s => {
+      if (s.querySelector('section')) return;                    // vertical stack parent
+      let theme = (s.className.match(/theme-(dark|electric|bay|white)/) || [])[0];
+      if (!theme) { theme = 'theme-dark'; s.classList.add(theme); }
+      if (!s.hasAttribute('data-state')) s.setAttribute('data-state', theme);
+      if (!s.classList.contains('no-chrome')) s.insertAdjacentHTML('afterbegin', chrome);
+    });
+  })();
+
+  Reveal.initialize({
+    width: 1920,
+    height: 1080,
+    margin: 0,
+    minScale: 0.2,
+    maxScale: 2,
+    center: false,
+    display: 'flex',
+    hash: true,
+    slideNumber: 'c/t',
+    controls: true,
+    progress: true,
+    transition: 'fade',
+    transitionSpeed: 'fast',
+    backgroundTransition: 'fade',
+    plugins: [RevealHighlight, RevealNotes]
+  });
+</script>
+</body>
+</html>
