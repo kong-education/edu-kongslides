@@ -270,8 +270,9 @@ html, body { background: var(--bg); }
   margin: 0 0 20px;
   font-size: var(--t-body);
   line-height: 1.4;
-  max-width: 24em;               /* keeps lines under ~65 characters */
+  max-width: 110em;               /* keeps lines under ~65 characters (was 24em) */
 }
+
 .reveal p.lead  { color: var(--fg-2); }
 .reveal p.small { font-size: var(--t-small); line-height: 1.45; color: var(--fg-2); }
 .reveal strong  { font-weight: 800; }
